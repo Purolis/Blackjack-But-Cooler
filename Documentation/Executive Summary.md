@@ -20,7 +20,7 @@ This will allow our program to favor those who are maybe just a little bit on th
 ### Expected Deliverables
 - Documentation that completely outlines the parameters and everything that we do in the project itself.
 - At least six sprints completely done.
-- Documentation that might hekp the user understand the project.
+- Documentation that might help the user understand the project.
 - A program that functions like Blackjack.
 - Funky additions to the Blackjack game that make it more innovating.
 
