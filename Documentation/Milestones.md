@@ -15,3 +15,12 @@ Milestones
     -Create a deck class.
 
     -Create a list for the deck class. 
+
+
+3/26/2025 - 3/29/2025
+
+    -Do any documentation needed.
+
+    -Create a money system with the Blackjack game.
+
+    -Create a health system (Note : MAYBE, we'll have to talk about it in class on Wednesday)
