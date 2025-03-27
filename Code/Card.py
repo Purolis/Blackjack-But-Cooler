@@ -2,11 +2,12 @@ class Card:
     __suite = None
     __val = None
 
-
+# --- CONSTRUCTORS -----------------------------------------------
     def __init__(self, suite, val):
         self.set_suite(suite)
         self.set_val(val)
 
+# --- GETTERS -----------------------------------------------
     def get_human_suite(self):
         output = None
         if self.get_suite() == 0:
@@ -39,7 +40,7 @@ class Card:
     def get_val(self):
         return self.__val
 
-
+# --- SETTERS -----------------------------------------------
     def set_suite(self, suite):
         try:
             self.__suite = int(suite) % 4
@@ -52,6 +53,7 @@ class Card:
         except ValueError as exc:
             print("Value Error in val")
 
+#--- TO_STRING -----------------------------------------------
     def __str__(self):
         return str(self.get_human_value()) + " of " + str(self.get_human_suite())
 
