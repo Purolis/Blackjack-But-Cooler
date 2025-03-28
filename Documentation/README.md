@@ -1,4 +1,4 @@
-### **[ [Click to go Back to Home] ](https://github.com/Purolis/Agile-Group-Project)**
+### **[ [---------------------------------------------- Click to go Back to Home -----------------------------------------------] ](https://github.com/Purolis/Agile-Group-Project)**
 
 # Documentation
 Herein lies all of our documentation files, see index below.
