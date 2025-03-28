@@ -22,9 +22,14 @@ Milestones
 3/26/2025 - 3/29/2025
 
     -Create a player class that allows for the Blackjack game.
+    
+    -Create a dealer class for the Blackjack game.
 
-    -Create a money system with the Blackjack game.
+    -Add money to the player.
 
-    -Create a health system (Note : MAYBE, we'll have to talk about it in class on Wednesday.
+    -Implement security and ensure attributes are private
 
-    -Create a dealer that allows for the game to work.
+    -Refactor code to make it look better
+    
+
+    -
