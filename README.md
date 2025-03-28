@@ -2,6 +2,11 @@
 ## Rough Idea
 Blackjack Balatro.<br>
 Basically we're making a digital version of blackjack, then getting funky with the implementation.
+Possible Ideas:
+- Health / Money System
+- Revival System
+- Life Counter
+- etc.... ( We don't know yet )
 
 ## Getting Started
 1. To get started, simply download the Code file [here](https://github.com/Purolis/Agile-Group-Project/tree/main/Code) and then go ahead and boot that up into the command prompt by simply cd C:\(directory). Go ahead and then just do driver.py (if in command line) or just run the driver.py file in PyCharm.
