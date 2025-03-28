@@ -1,4 +1,5 @@
 class Player:
+    
     def __init__(self):
         self.__hand_value = 0
         self.__hand = []
