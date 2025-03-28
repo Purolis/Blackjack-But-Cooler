@@ -1,36 +1,36 @@
-from Card import Card
-import random
+class Card:
+    __value = None
+    __suit = None
+    __name = None
 
+    def __init__(self, value, suit, name):
+# - init does not use setters
+        self.__value = value
+        self.__suit = suit
+        self.__name = name
 
-class Deck:
-    __card_suits = []
-    __cards_list = []
-    __face_cards = {'Ace': None, 'Jack': None, 'Queen': None, 'King': None}
-    __deck = []
+    def get_value(self):
+        return self.__value
 
-    def __init__(self):
-        self.__card_suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
-        self.__cards_list = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
-        self.__face_cards = {'Ace': 11, 'Jack': 10, 'Queen': 10, 'King': 10}
-        self.__deck = []
+    def get_suit(self):
+        return self.__suit
 
-    def create_deck(self):
-        for suit in self.__card_suits:
-            for card in self.__cards_list:
-                if card in self.__face_cards:
-                    self.__deck.append(Card(int(self.__face_cards[card]), suit, f'{card} of {suit}'))
-                else:
-                    self.__deck.append(Card(int(card), suit, f'{card} of {suit}'))
+    def get_name(self):
+        return self.__name
 
-    def shuffle_deck(self):
-        random.shuffle(self.__deck)
+    def set_value(self, value):
+        self.__value = value
+        return self.__value
+# - returning in setter?
 
-    def get_deck(self):
-        return self.__deck
+    def set_suit(self, suit):
+        self.__suit = suit
+        return self.__suit
+# - returning in setter?
 
-    def draw_card(self):
-        return self.__deck.pop()
-
-    def set_deck(self, deck):
-        self.__deck = deck
-        return self.__deck
+    def set_name(self, name):
+        self.__name = name
+        return self.__name
+# - returning in setter?
+# also __str__ functions are absent from Classes
+# 
