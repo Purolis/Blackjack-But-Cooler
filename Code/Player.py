@@ -6,7 +6,7 @@ class Player:
     def __init__(self, hand, hand_value, wealth):
         self.set_hand(hand)
         self.set_hand_value(hand_value)
-        self.set_playerWealth(wealth)
+        self.set_player_wealth(wealth)
         # money should be a player attribute.
 
     def draw(self, card):
@@ -31,8 +31,8 @@ class Player:
     def get_hand_value(self):
         return self.__hand_value
 
-    def get_playerWealth(self):
-        return self._playerWealth
+    def get_player_wealth(self):
+        return self._player_wealth
 
     def set_hand(self, hand):
         self.__hand = hand
@@ -40,5 +40,5 @@ class Player:
     def set_hand_value(self, hand_value):
         self.__hand_value = hand_value
 
-    def set_playerWealth(self, cash):
-        self._playerWealth = cash
+    def set_player_wealth(self, cash):
+        self._player_wealth = cash
