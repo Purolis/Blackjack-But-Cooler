@@ -14,10 +14,8 @@ def main():
     p1 = Player()
     dealer = Dealer()
     players = [p1, dealer]
-    cash = Money(50, 50)
-    playerWealth = cash.get_playerWealth()
-    computerWealth = cash.get_computerWealth()
-
+    cash = Money(50)
+    player_wealth = cash.get_player_wealth()
 
     for x in range(2):
         for player in players:
@@ -47,10 +45,9 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nYou busted, you lose!')
-                        playerWealth -= 50
-                        cash.set_playerWealth(playerWealth)
-                        print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
-                        cash.set_computerWealth(computerWealth)
+                        player_wealth -= 50
+                        cash.set_player_wealth(player_wealth)
+                        print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
                         print("You lost all your money! You lose at life!")
 
                         break
@@ -74,12 +71,10 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nDealer busts, you win!')
-                        playerWealth += 50
-                        cash.set_playerWealth(playerWealth)
-                        computerWealth -= 50
-                        cash.set_computerWealth(computerWealth)
+                        player_wealth += 50
+                        cash.set_player_wealth(player_wealth)
 
-                        print('\nYou won $50 Dollars! You now have $', playerWealth, 'dollars!')
+                        print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                         break
 
                     if p1_value > dealer_value:
@@ -97,12 +92,10 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print(f'\n{p1_value} loses to {dealer_value}, you lose!')
-                        playerWealth -= 50
-                        cash.set_playerWealth(playerWealth)
-                        print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
-                        cash.set_computerWealth(computerWealth)
+                        player_wealth -= 50
+                        cash.set_player_wealth(player_wealth)
+                        print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
                         print("You lost all your money! You lose at life!")
-
 
                     break
             else:
@@ -110,22 +103,19 @@ def main():
                 print()
                 display_player_cards(p1.get_hand(), p1_value)
                 print('\nYou have Black Jack, you win!')
-                playerWealth += 50
-                cash.set_playerWealth(playerWealth)
-                computerWealth -= 50
-                cash.set_computerWealth(computerWealth)
+                player_wealth += 50
+                cash.set_player_wealth(player_wealth)
 
-                print('\nYou won $50 Dollars! You now have $', playerWealth, 'dollars!')
+                print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                 break
         else:
             display_player_cards(dealer.get_hand(), dealer_value, 'Their')
             print()
             display_player_cards(p1.get_hand(), p1_value)
             print('\nThe dealer has Black Jack, you lose!')
-            playerWealth -= 50
-            cash.set_playerWealth(playerWealth)
-            print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
-            cash.set_computerWealth(computerWealth)
+            player_wealth -= 50
+            cash.set_player_wealth(player_wealth)
+            print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
             print("You lost all your money! You lose at life!")
             break
 
