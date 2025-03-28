@@ -24,6 +24,7 @@ def main():
 
     while True:
         # explain this w/ comments 🡻
+        # clears the terminal output to simplify the display (makes current state more obvious)
         os.system('cls' if os.name == 'nt' else 'clear')
 
         p1_value = p1.count_hand()
@@ -39,7 +40,7 @@ def main():
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
                 display_player_cards(p1.get_hand(), p1_value)
-                user_choice = choice()
+                user_choice = user_choice()
 
                 if user_choice.upper() == 'H':
                     p1.draw(decklist.draw_card())
@@ -133,33 +134,20 @@ def display_player_cards(hand, player_value, player='Your'):
     print(f'[Value: {player_value}]')
 
 
-def choice():  
-# rename choice()
-#     to user_prompt() or similar
+def user_prompt():
+    user_choice = input('\nHit or Stand | Type H or S: ')
 
-
-# instead:
-#     valid_entry = False
-#     while !valid_entry:
-#         try:
-#             if user.upper() == 'H' or user.upper() == 'S':
-#                 valid_entry = true
-#             else:
-#                 user = input('Not a valid input | Type H or S: ')
-#         except:
-#             pass
-# rename "user" to "user_input"
-    user = input('\nHit or Stand | Type H or S: ')
-    while True:
+    valid_entry = False
+    while not valid_entry:
         try:
-            if user.upper() == 'H' or user.upper() == 'S':
-                break
+            if user_choice.upper() == 'H' or user_choice.upper() == 'S':
+                valid_entry = True
             else:
-                user = input('Not a valid input | Type H or S: ')
-        except:
+                user_choice = input('Not a valid input | Type H or S: ')
+        except: # extend this, what errors
             pass
 
-    return user
+    return user_choice
 
 
 if __name__ == '__main__':
