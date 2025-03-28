@@ -3,10 +3,10 @@
 
 class Money:
 
-    def __init__(self):
+    def __init__(self, player, computer):
 
-        self._playerWealth = 100
-        self._computerWealth = 200
+        self._playerWealth = player
+        self._computerWealth = computer
 
     def get_playerWealth(self):
         return self._playerWealth
