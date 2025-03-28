@@ -4,9 +4,9 @@ class Card:
     __name = None
 
     def __init__(self, value, suit, name):
-        self.__value = value
-        self.__suit = suit
-        self.__name = name
+        self.set_value(value)
+        self.set_suit(suit)
+        self.set_name(name)
 
     def get_value(self):
         return self.__value
