@@ -26,15 +26,9 @@ def main():
         # clear the terminal output to simplify the display (makes current state more obvious)
         os.system('cls' if os.name == 'nt' else 'clear')
 
-        # p1_value = p1.count_hand()
-        # dealer_value = dealer.count_hand()
-# - why not just use p1.count_hand() ? 
-#           unnecessary variables is confusing, can lead to logic errors
-#           use get_hand_value() instead of count_hand()
-
         if dealer.count_hand() != 21:
             if p1.count_hand() != 21 or p1.count_hand() == 21 and len(p1.get_hand()) > 2:
-# - make "Their hand" the name of the player e.g. "Dealer", "You"
+# - transfer "dealer hand" "player hand" etc. to __str__ calls
                 print('Dealer Hand:')
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
