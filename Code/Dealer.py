@@ -1,37 +1,39 @@
-class Dealer:
-# - could simplify into just "Player"
-#         or make Dealer a subclass of Player
-
-# - data attributes???
+from Card import Card
+import random
 
 
-    def __init__(self):
-# - no setters in init???
-        self.__hand_value = 0
-        self.__hand = []
+class Deck:
+    __card_suits = []
+    __cards_list = []
+    __face_cards = {'Ace': None, 'Jack': None, 'Queen': None, 'King': None}
+    __deck = []
 
-    def draw(self, card):
-        self.__hand.append(card)
-        return self.__hand
+    def __init__(self, deck):
+        self.set_deck(deck)
 
-    def count_hand(self):
-        self.__hand_value = 0
-        for card in self.__hand:
-            self.__hand_value += card.get_value()
+    def create_deck(self):
+        self.__card_suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+        self.__cards_list = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+        self.__face_cards = {'Ace': 11, 'Jack': 10, 'Queen': 10, 'King': 10}
+        self.__deck = []
 
-        if self.__hand_value > 21:
-            for card in self.__hand:
-                if card.get_value() == 11:
-                    self.__hand_value -= 10
-                    break
+        for suit in self.__card_suits:
+            for card in self.__cards_list:
+                if card in self.__face_cards:
+                    self.__deck.append(Card(int(self.__face_cards[card]), suit, f'{card} of {suit}'))
+                else:
+                    self.__deck.append(Card(int(card), suit, f'{card} of {suit}'))
 
-        return self.__hand_value
 
-    def get_hand(self):
-        return self.__hand
+    def shuffle_deck(self):
+        random.shuffle(self.__deck)
 
-    def get_hand_value(self):
-        return self.__hand_value
+    def get_deck(self):
+        return self.__deck
 
-# - setters??? 
-        # 
+    def draw_card(self):
+        return self.__deck.pop()
+
+    def set_deck(self, deck):
+        self.__deck = deck
+        return self.__deck
