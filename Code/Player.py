@@ -1,8 +1,11 @@
 class Player:
-    
-    def __init__(self):
-        self.__hand_value = 0
-        self.__hand = []
+    __hand_value = None
+    __hand = []
+
+    def __init__(self, hand, hand_value):
+        self.set_hand(hand)
+        self.set_hand_value(hand_value)
+        # money should be a player attribute.
 
     def draw(self, card):
         self.__hand.append(card)
@@ -17,7 +20,6 @@ class Player:
             for card in self.__hand:
                 if card.get_value() == 11:
                     self.__hand_value -= 10
-                    break
 
         return self.__hand_value
 
@@ -26,3 +28,9 @@ class Player:
 
     def get_hand_value(self):
         return self.__hand_value
+
+    def set_hand(self, hand):
+        self.__hand = hand
+
+    def set_hand_value(self, hand_value):
+        self.__hand_value = hand_value
