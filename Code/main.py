@@ -1,7 +1,6 @@
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
-from Money import Money
 import os
 import time
 
@@ -11,11 +10,10 @@ def main():
     decklist.create_deck()
     decklist.shuffle_deck()
 
-    p1 = Player([], 0)
+    p1 = Player([], 0, 1000)
     dealer = Dealer([], 0)
     players = [p1, dealer]
-    cash = Money(50)
-    player_wealth = cash.get_player_wealth()
+    player_wealth = p1.get_player_wealth()
 
     for x in range(2):
         for player in players:
@@ -46,7 +44,7 @@ def main():
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nYou busted, you lose!')
                         player_wealth -= 50
-                        cash.set_player_wealth(player_wealth)
+                        p1.set_player_wealth(player_wealth)
                         print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
                         print("You lost all your money! You lose at life!")
 
@@ -72,7 +70,7 @@ def main():
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nDealer busts, you win!')
                         player_wealth += 50
-                        cash.set_player_wealth(player_wealth)
+                        p1.set_player_wealth(player_wealth)
 
                         print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                         break
@@ -93,7 +91,7 @@ def main():
                         display_player_cards(p1.get_hand(), p1_value)
                         print(f'\n{p1_value} loses to {dealer_value}, you lose!')
                         player_wealth -= 50
-                        cash.set_player_wealth(player_wealth)
+                        p1.set_player_wealth(player_wealth)
                         print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
                         print("You lost all your money! You lose at life!")
 
@@ -104,7 +102,7 @@ def main():
                 display_player_cards(p1.get_hand(), p1_value)
                 print('\nYou have Black Jack, you win!')
                 player_wealth += 50
-                cash.set_player_wealth(player_wealth)
+                p1.set_player_wealth(player_wealth)
 
                 print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                 break
@@ -114,7 +112,7 @@ def main():
             display_player_cards(p1.get_hand(), p1_value)
             print('\nThe dealer has Black Jack, you lose!')
             player_wealth -= 50
-            cash.set_player_wealth(player_wealth)
+            p1.set_player_wealth(player_wealth)
             print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
             print("You lost all your money! You lose at life!")
             break
