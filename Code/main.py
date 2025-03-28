@@ -23,34 +23,32 @@ def main():
             player.draw(decklist.draw_card())
 
     while True:
-        # explain this w/ comments 🡻
-        # clears the terminal output to simplify the display (makes current state more obvious)
+        # clear the terminal output to simplify the display (makes current state more obvious)
         os.system('cls' if os.name == 'nt' else 'clear')
 
-        p1_value = p1.count_hand()
-        dealer_value = dealer.count_hand()
+        # p1_value = p1.count_hand()
+        # dealer_value = dealer.count_hand()
 # - why not just use p1.count_hand() ? 
 #           unnecessary variables is confusing, can lead to logic errors
 #           use get_hand_value() instead of count_hand()
 
-        if dealer_value != 21:
-            if p1_value != 21 or p1_value == 21 and len(p1.get_hand()) > 2:
+        if dealer.count_hand() != 21:
+            if p1.count_hand() != 21 or p1.count_hand() == 21 and len(p1.get_hand()) > 2:
 # - make "Their hand" the name of the player e.g. "Dealer", "You"
-                print('Their Hand:')
+                print('Dealer Hand:')
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
-                display_player_cards(p1.get_hand(), p1_value)
-                user_choice = user_choice()
+                display_player_cards(p1.get_hand(), p1.count_hand())
+                user_choice = user_prompt()
 
                 if user_choice.upper() == 'H':
                     p1.draw(decklist.draw_card())
-                    p1_value = p1.count_hand()
 
-                    if p1_value > 21:
+                    if p1.count_hand() > 21:
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                        display_player_cards(dealer.get_hand(), dealer.count_hand(), 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
+                        display_player_cards(p1.get_hand(), p1.count_hand())
                         print('\nYou busted, you lose!')
                         player_wealth -= 50
                         cash.set_player_wealth(player_wealth)
@@ -60,23 +58,22 @@ def main():
                         break
 
                 else:
-                    while dealer_value < 17:
+                    while dealer.count_hand() < 17:
                         time.sleep(1.5)
                         os.system('cls' if os.name == 'nt' else 'clear')
 
                         dealer.draw(decklist.draw_card())
-                        dealer_value = dealer.count_hand()
 
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                        display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
+                        display_player_cards(p1.get_hand(), p1.count_hand())
 
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    if dealer_value > 21:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                    if dealer.count_hand() > 21:
+                        display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
+                        display_player_cards(p1.get_hand(), p1.count_hand())
                         print('\nDealer busts, you win!')
                         player_wealth += 50
                         cash.set_player_wealth(player_wealth)
@@ -84,21 +81,21 @@ def main():
                         print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                         break
 
-                    if p1_value > dealer_value:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                    if p1.count_hand() > dealer.count_hand:
+                        display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} beats {dealer_value}, you win!')
-                    elif p1_value == dealer_value:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                        display_player_cards(p1.get_hand(), p1.count_hand())
+                        print(f'\n{p1.count_hand()} beats {dealer.count_hand}, you win!')
+                    elif p1.count_hand() == dealer.count_hand:
+                        display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} ties {dealer_value}, you push!')
+                        display_player_cards(p1.get_hand(), p1.count_hand())
+                        print(f'\n{p1.count_hand()} ties {dealer.count_hand}, you push!')
                     else:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                        display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} loses to {dealer_value}, you lose!')
+                        display_player_cards(p1.get_hand(), p1.count_hand())
+                        print(f'\n{p1.count_hand()} loses to {dealer.count_hand}, you lose!')
                         player_wealth -= 50
                         cash.set_player_wealth(player_wealth)
                         print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
@@ -106,9 +103,9 @@ def main():
 
                     break
             else:
-                display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
                 print()
-                display_player_cards(p1.get_hand(), p1_value)
+                display_player_cards(p1.get_hand(), p1.count_hand())
                 print('\nYou have Black Jack, you win!')
                 player_wealth += 50
                 cash.set_player_wealth(player_wealth)
@@ -116,9 +113,9 @@ def main():
                 print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
                 break
         else:
-            display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+            display_player_cards(dealer.get_hand(), dealer.count_hand, 'Their')
             print()
-            display_player_cards(p1.get_hand(), p1_value)
+            display_player_cards(p1.get_hand(), p1.count_hand())
             print('\nThe dealer has Black Jack, you lose!')
             player_wealth -= 50
             cash.set_player_wealth(player_wealth)
@@ -135,6 +132,8 @@ def display_player_cards(hand, player_value, player='Your'):
 
 
 def user_prompt():
+    # refactor to be universal, just a validator
+    # parameters: valid_chars[]
     user_choice = input('\nHit or Stand | Type H or S: ')
 
     valid_entry = False
