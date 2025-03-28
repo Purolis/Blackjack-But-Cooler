@@ -31,5 +31,3 @@ Milestones
 
     -Refactor code to make it look better
     
-
-    -
