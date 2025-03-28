@@ -1,5 +1,12 @@
 class Dealer:
+# - could simplify into just "Player"
+#         or make Dealer a subclass of Player
+
+# - data attributes???
+
+
     def __init__(self):
+# - no setters in init???
         self.__hand_value = 0
         self.__hand = []
 
@@ -25,3 +32,6 @@ class Dealer:
 
     def get_hand_value(self):
         return self.__hand_value
+
+# - setters??? 
+        # 
