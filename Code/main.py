@@ -14,6 +14,7 @@ def main():
     p1 = Player()
     dealer = Dealer()
     players = [p1, dealer]
+# - Money should be a Player data attribute; makes it extensible
     cash = Money(50)
     player_wealth = cash.get_player_wealth()
 
@@ -22,13 +23,18 @@ def main():
             player.draw(decklist.draw_card())
 
     while True:
+        # explain this w/ comments 🡻
         os.system('cls' if os.name == 'nt' else 'clear')
 
         p1_value = p1.count_hand()
         dealer_value = dealer.count_hand()
+# - why not just use p1.count_hand() ? 
+#           unnecessary variables is confusing, can lead to logic errors
+#           use get_hand_value() instead of count_hand()
 
         if dealer_value != 21:
             if p1_value != 21 or p1_value == 21 and len(p1.get_hand()) > 2:
+# - make "Their hand" the name of the player e.g. "Dealer", "You"
                 print('Their Hand:')
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
@@ -127,7 +133,22 @@ def display_player_cards(hand, player_value, player='Your'):
     print(f'[Value: {player_value}]')
 
 
-def choice():
+def choice():  
+# rename choice()
+#     to user_prompt() or similar
+
+
+# instead:
+#     valid_entry = False
+#     while !valid_entry:
+#         try:
+#             if user.upper() == 'H' or user.upper() == 'S':
+#                 valid_entry = true
+#             else:
+#                 user = input('Not a valid input | Type H or S: ')
+#         except:
+#             pass
+# rename "user" to "user_input"
     user = input('\nHit or Stand | Type H or S: ')
     while True:
         try:
