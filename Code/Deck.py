@@ -28,11 +28,11 @@ class Deck:
     def shuffle_deck(self):
         random.shuffle(self.__deck)
 
-    def get_deck(self):
-        return self.__deck
-
     def draw_card(self):
         return self.__deck.pop()
+    
+    def get_deck(self):
+        return self.__deck
 
     def set_deck(self, deck):
         self.__deck = deck
