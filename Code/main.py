@@ -1,13 +1,10 @@
-# NOTE FOR TEAM
-# | driver file
-# | should be the only file that you run, anything else should be a module
-# | separate functions into their own modules as needed
-
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
+from Money import Money
 import os
 import time
+
 
 def main():
     decklist = Deck()
@@ -17,6 +14,10 @@ def main():
     p1 = Player()
     dealer = Dealer()
     players = [p1, dealer]
+    cash = Money(50, 50)
+    playerWealth = cash.get_playerWealth()
+    computerWealth = cash.get_computerWealth()
+
 
     for x in range(2):
         for player in players:
@@ -46,6 +47,12 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nYou busted, you lose!')
+                        playerWealth -= 50
+                        cash.set_playerWealth(playerWealth)
+                        print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
+                        cash.set_computerWealth(computerWealth)
+                        print("You lost all your money! You lose at life!")
+
                         break
 
                 else:
@@ -67,6 +74,12 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print('\nDealer busts, you win!')
+                        playerWealth += 50
+                        cash.set_playerWealth(playerWealth)
+                        computerWealth -= 50
+                        cash.set_computerWealth(computerWealth)
+
+                        print('\nYou won $50 Dollars! You now have $', playerWealth, 'dollars!')
                         break
 
                     if p1_value > dealer_value:
@@ -84,6 +97,12 @@ def main():
                         print()
                         display_player_cards(p1.get_hand(), p1_value)
                         print(f'\n{p1_value} loses to {dealer_value}, you lose!')
+                        playerWealth -= 50
+                        cash.set_playerWealth(playerWealth)
+                        print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
+                        cash.set_computerWealth(computerWealth)
+                        print("You lost all your money! You lose at life!")
+
 
                     break
             else:
@@ -91,12 +110,23 @@ def main():
                 print()
                 display_player_cards(p1.get_hand(), p1_value)
                 print('\nYou have Black Jack, you win!')
+                playerWealth += 50
+                cash.set_playerWealth(playerWealth)
+                computerWealth -= 50
+                cash.set_computerWealth(computerWealth)
+
+                print('\nYou won $50 Dollars! You now have $', playerWealth, 'dollars!')
                 break
         else:
             display_player_cards(dealer.get_hand(), dealer_value, 'Their')
             print()
             display_player_cards(p1.get_hand(), p1_value)
             print('\nThe dealer has Black Jack, you lose!')
+            playerWealth -= 50
+            cash.set_playerWealth(playerWealth)
+            print('\nYou lost $50 Dollars! You now have $', playerWealth, 'dollars!\n')
+            cash.set_computerWealth(computerWealth)
+            print("You lost all your money! You lose at life!")
             break
 
 
