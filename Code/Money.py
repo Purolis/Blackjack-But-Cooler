@@ -1,21 +1,12 @@
-
-
-
 class Money:
+    __player_wealth = None
 
-    def __init__(self, player, computer):
+    def __init__(self, player):
 
-        self._playerWealth = player
-        self._computerWealth = computer
+        self.__player_wealth = player
 
-    def get_playerWealth(self):
-        return self._playerWealth
+    def get_player_wealth(self):
+        return self.__player_wealth
 
-    def get_computerWealth(self):
-        return self._playerWealth
-
-    def set_playerWealth(self, cash):
-        self._playerWealth = cash
-
-    def set_computerWealth(self, cash):
-        self._computerWealth = cash
+    def set_player_wealth(self, cash):
+        self.__player_wealth = cash
