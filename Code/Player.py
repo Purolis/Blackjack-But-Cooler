@@ -31,14 +31,14 @@ class Player:
     def get_hand_value(self):
         return self.__hand_value
 
+    def get_playerWealth(self):
+        return self._playerWealth
+
     def set_hand(self, hand):
         self.__hand = hand
 
     def set_hand_value(self, hand_value):
         self.__hand_value = hand_value
-
-    def get_playerWealth(self):
-        return self._playerWealth
 
     def set_playerWealth(self, cash):
         self._playerWealth = cash
