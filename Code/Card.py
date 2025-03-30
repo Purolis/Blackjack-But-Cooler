@@ -24,12 +24,9 @@ class Card:
     # Setters
     def set_value(self, value):
         self.__value = value
-        return self.__value
 
     def set_suit(self, suit):
         self.__suit = suit
-        return self.__suit
 
     def set_name(self, name):
         self.__name = name
-        return self.__name
