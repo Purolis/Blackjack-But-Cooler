@@ -30,4 +30,23 @@ Milestones
     -Implement security and ensure attributes are private
 
     -Refactor code to make it look better
+
+    -Catch user input
     
+3/30/2025 - 03/31/2025
+
+    -Refactor the code
+
+    -Make the Dealer a subclass of the Player
+
+    -Clean up any errors
+
+    -More security tests
+
+04/02/2025 - 04/04/2025
+
+    -Get the fully operational betting system working (might take longer)
+
+    -User input validation
+
+    -More security tests
