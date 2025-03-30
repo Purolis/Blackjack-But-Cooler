@@ -1,17 +1,22 @@
 class Player:
+
+    # Default Variables
     __hand_value = None
     __hand = []
     __player_wealth = None
 
+    # Initialization
     def __init__(self, hand, hand_value, wealth):
         self.set_hand(hand)
         self.set_hand_value(hand_value)
         self.set_player_wealth(wealth)
 
+    # Draw a card function
     def draw(self, card):
         self.__hand.append(card)
         return self.__hand
 
+    # Counts the number in the hand function
     def count_hand(self):
         self.__hand_value = 0
         for card in self.__hand:
@@ -24,6 +29,7 @@ class Player:
 
         return self.__hand_value
 
+    # Getters
     def get_hand(self):
         return self.__hand
 
@@ -33,6 +39,7 @@ class Player:
     def get_player_wealth(self):
         return self.__player_wealth
 
+    # Setters
     def set_hand(self, hand):
         self.__hand = hand
 
