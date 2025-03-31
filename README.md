@@ -16,4 +16,4 @@ Possible Ideas:
 Note: It will also work in PyCharm, but won't look as pretty.
 
 
-#### Team Members - Jerry Cai, Team Lead | Evan Caudy, Design Lead | Addonis Lattimore, Code Lead | Nate Merz, Documentation Lead | Nova Scholarz, Security Lead
+#### Team Members - Jerry Cai, Team Lead | Evan Caudy, Design Lead | Addonis Lattimore, Code Lead | Nate Merz, Documentation Lead | Nova Solarz, Security Lead
