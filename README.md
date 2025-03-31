@@ -15,5 +15,26 @@ Possible Ideas:
 
 Note: It will also work in PyCharm, but won't look as pretty.
 
+## Code
+- [Card Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Card.py)
+- [Dealer Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Dealer.py)
+- [Deck Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Deck.py)
+- [Player Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Player.py)
+- [Main](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/main.py)
+
+## Documentation
+- [Timeline](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Timeline.png)
+- [Testing](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Testing.md)
+- [Scope Statement](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Scope%20Statement.md)
+- [Rough Idea](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Rough%20Idea.md)
+- [Milestones](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Milestones.md)
+- [Executive Summary](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Executive%20Summary.md)
+
+## Design / Diagrams
+- [Story One](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20One.jpg)
+- [Story Two](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Two.jpg)
+- [UML Diagram](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/Blackjack%20UML.jpg)
+
+
 
 #### Team Members - Jerry Cai, Team Lead | Evan Caudy, Design Lead | Addonis Lattimore, Code Lead | Nate Merz, Documentation Lead | Nova Solarz, Security Lead
