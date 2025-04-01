@@ -6,7 +6,6 @@ import time
 
 
 def main():
-
     # Creates a deck and shuffles the deck
     decklist = Deck([])
     decklist.create_deck()
@@ -53,16 +52,8 @@ def main():
                     # Game logic, if hand value is over 21 you lose automatically.
                     if p1_value > 21:
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print('\nYou busted, you lose!')
-                        player_wealth -= 50
-                        p1.set_player_wealth(player_wealth)
-                        print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
-                        print("You lost all your money! You lose at life!")
-
-                        break
+                        outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                                '\nYou busted, you lose!', 'lost', -50)
 
                 else:
 
@@ -83,65 +74,35 @@ def main():
 
                     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
                     if dealer_value > 21:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print('\nDealer busts, you win!')
-                        player_wealth += 50
-                        p1.set_player_wealth(player_wealth)
-
-                        print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
+                        outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                                '\nDealer busts, you win!', 'won', 50)
                         break
 
                     # Game logic, if you have a higher value than dealer at the end of all of this, you win!
                     if p1_value > dealer_value:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} beats {dealer_value}, you win!')
+                        outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                                f'\n{p1_value} beats {dealer_value}, you win!', 'win', 50)
 
                     # Game logic, if you have the same values, you push or tie.
                     elif p1_value == dealer_value:
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} ties {dealer_value}, you push!')
+                        outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                                f'\n{p1_value} ties {dealer_value}, you push!', 'pushed', 0)
                     else:
 
                         # Game logic, else you will therefore have nothing but less than them so you lose.
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1_value)
-                        print(f'\n{p1_value} loses to {dealer_value}, you lose!')
-                        player_wealth -= 50
-                        p1.set_player_wealth(player_wealth)
-                        print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
-                        print("You lost all your money! You lose at life!")
-
-                    break
+                        outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                                f'\n{p1_value} loses to {dealer_value}, you lose!', 'lost', -50)
+                        break
             else:
-
                 # Game logic, you had 21 at the start from the beginning if statement!
-                display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-                print()
-                display_player_cards(p1.get_hand(), p1_value)
-                print('\nYou have Black Jack, you win!')
-                player_wealth += 50
-                p1.set_player_wealth(player_wealth)
-
-                print('\nYou won $50 Dollars! You now have $', player_wealth, 'dollars!')
+                outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                        'You have Black jack, you win!',
+                        'win', '50')
                 break
         else:
-
             # Game logic, the dealer has black jack, you automatically lose no matter what.
-            display_player_cards(dealer.get_hand(), dealer_value, 'Their')
-            print()
-            display_player_cards(p1.get_hand(), p1_value)
-            print('\nThe dealer has Black Jack, you lose!')
-            player_wealth -= 50
-            p1.set_player_wealth(player_wealth)
-            print('\nYou lost $50 Dollars! You now have $', player_wealth, 'dollars!\n')
-            print("You lost all your money! You lose at life!")
+            outcome(dealer, p1, dealer_value, p1_value, player_wealth,
+                    'The dealer has Black jack, you lose!', 'lost', -50)
             break
 
 
@@ -151,6 +112,16 @@ def display_player_cards(hand, player_value, player='Your'):
     for card in hand:
         print(f'[{card.get_name()}]', end=' ')
     print(f'[Value: {player_value}]')
+
+
+def outcome(dealer, p1, dealer_value, p1_value, player_wealth, print_prompt, win_lose, outcome_number):
+    display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+    print()
+    display_player_cards(p1.get_hand(), p1_value)
+    print('\n', print_prompt)
+    p1.set_player_wealth(player_wealth + outcome_number)
+
+    print('\nYou ', win_lose, ' $50 Dollars! You now have $', p1.get_player_wealth(), 'dollars!')
 
 
 # Choice function that asks for hit or stand and return the choice given by user.
