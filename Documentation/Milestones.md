@@ -58,3 +58,9 @@ Milestones
     -Add items to player class
 
     -Create user stories
+
+04/04/2025 - 04/06/2025
+
+    -Implement more players 
+
+    -Potentially start a gui
