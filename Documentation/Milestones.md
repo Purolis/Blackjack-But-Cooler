@@ -54,3 +54,7 @@ Milestones
     -User input validation
 
     -More security tests
+
+    -Add items to player class
+
+    -Create user stories
