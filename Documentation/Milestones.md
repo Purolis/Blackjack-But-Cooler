@@ -41,6 +41,10 @@ Milestones
 
     -Clean up any errors
 
+    -Remove the breaks
+
+    -Make sure code follows OOP standards and practices
+
     -More security tests
 
 04/02/2025 - 04/04/2025
