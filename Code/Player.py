@@ -4,8 +4,6 @@ from Dealer import Dealer
 class Player(Dealer):
 
     # Default Variables
-    __hand_value = None
-    __hand = []
     __player_wealth = None
 
     # Initialization
