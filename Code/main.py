@@ -58,6 +58,7 @@ def game_logic(p1, dealer, decklist):
                         os.system('cls' if os.name == 'nt' else 'clear')
                         outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
                                 '\nYou busted, you lose!', 'lost', -50)
+                        loop_boolean = True
 
                 else:
 
@@ -83,7 +84,7 @@ def game_logic(p1, dealer, decklist):
                         loop_boolean = True
 
                     # Game logic, if you have a higher value than dealer at the end of all of this, you win!
-                    if p1_value > dealer_value:
+                    if p1_value > dealer_value and p1_value < 21:
                         outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
                                 f'\n{p1_value} beats {dealer_value}, you win!', 'win', 50)
 
@@ -91,7 +92,7 @@ def game_logic(p1, dealer, decklist):
                     elif p1_value == dealer_value:
                         outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
                                 f'\n{p1_value} ties {dealer_value}, you push!', 'pushed', 0)
-                    else:
+                    if p1_value < dealer_value and dealer_value < 21:
 
                         # Game logic, else you will therefore have nothing but less than them so you lose.
                         outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
@@ -123,9 +124,9 @@ def outcome(dealer, p1, dealer_value, p1_value, player_wealth, print_prompt, win
     print()
     display_player_cards(p1.get_hand(), p1_value)
     print('\n', print_prompt)
-    p1.set_player_wealth(player_wealth + outcome_number)
+    p1.set_player_wealth(p1.get_player_wealth() + outcome_number)
 
-    print('\nYou ', win_lose, ' $50 Dollars! You now have $', p1.get_player_wealth(), 'dollars!')
+    print('\nYou',win_lose,' $50 Dollars! You now have $',p1.get_player_wealth(),'dollars!')
 
 
 # Choice function that asks for hit or stand and return the choice given by user.
