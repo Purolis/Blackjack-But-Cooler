@@ -32,18 +32,18 @@ def game_logic(p1, dealer, decklist):
         os.system('cls' if os.name == 'nt' else 'clear')
 
         # Count's the hand value
-        p1_value = p1.count_hand()
-        dealer_value = dealer.count_hand()
+        p1.set_hand_value(p1.count_hand())
+        dealer.set_hand_value(p1.count_hand())
 
         # If statements for game logic.
-        if dealer_value != 21:
+        if dealer.get_hand_value() != 21:
 
             # If dealer doesn't have Blackjack, move forward and display the hands
-            if p1_value != 21 or p1_value == 21 and len(p1.get_hand()) > 2:
+            if p1.get_hand_value() != 21 or p1.get_hand_value() == 21 and len(p1.get_hand()) > 2:
                 print('Their Hand:')
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
-                display_player_cards(p1.get_hand(), p1_value)
+                display_player_cards(p1.get_hand(), p1.get_hand_value())
                 user_choice = choice()
 
                 # User input for stand or hit, if hit move forward
@@ -51,62 +51,62 @@ def game_logic(p1, dealer, decklist):
 
                     # Draw card and recount the hand and set it to the value.
                     p1.draw(decklist.draw_card())
-                    p1_value = p1.count_hand()
+                    p1.set_hand_value(p1.count_hand())
 
                     # Game logic, if hand value is over 21 you lose automatically.
-                    if p1_value > 21:
+                    if p1.get_hand_value() > 21:
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
+                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
                                 '\nYou busted, you lose!', 'lost', -50)
                         loop_boolean = True
 
                 else:
 
                     # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
-                    while dealer_value < 17:
+                    while dealer.get_hand_value() < 17:
                         time.sleep(1.5)
                         os.system('cls' if os.name == 'nt' else 'clear')
 
                         dealer.draw(decklist.draw_card())
-                        dealer_value = dealer.count_hand()
+                        dealer.set_hand_value(dealer.count_hand())
 
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        display_player_cards(dealer.get_hand(), dealer_value, 'Their')
+                        display_player_cards(dealer.get_hand(), dealer.get_hand_value(), 'Their')
                         print()
-                        display_player_cards(p1.get_hand(), p1_value)
+                        display_player_cards(p1.get_hand(), p1.get_hand_value())
 
                     os.system('cls' if os.name == 'nt' else 'clear')
 
                     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
-                    if dealer_value > 21:
-                        outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
+                    if dealer.get_hand_value() > 21:
+                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
                                 '\nDealer busts, you win!', 'won', 50)
                         loop_boolean = True
 
                     # Game logic, if you have a higher value than dealer at the end of all of this, you win!
-                    if p1_value > dealer_value and p1_value < 21:
-                        outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
-                                f'\n{p1_value} beats {dealer_value}, you win!', 'win', 50)
+                    if p1.get_hand_value() > dealer.get_hand_value() and p1.get_hand_value() < 21:
+                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                                f'\n{p1.get_hand_value()} beats {dealer.get_hand_value()}, you win!', 'win', 50)
 
                     # Game logic, if you have the same values, you push or tie.
-                    elif p1_value == dealer_value:
-                        outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
-                                f'\n{p1_value} ties {dealer_value}, you push!', 'pushed', 0)
-                    if p1_value < dealer_value and dealer_value < 21:
+                    elif p1.get_hand_value() == dealer.get_hand_value():
+                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                                f'\n{p1.get_hand_value()} ties {dealer.get_hand_value()}, you push!', 'pushed', 0)
+                    if p1.get_hand_value() < dealer.get_hand_value() and dealer.get_hand_value() < 21:
 
                         # Game logic, else you will therefore have nothing but less than them so you lose.
-                        outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
-                                f'\n{p1_value} loses to {dealer_value}, you lose!', 'lost', -50)
+                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                                f'\n{p1.get_hand_value()} loses to {dealer.get_hand_value()}, you lose!', 'lost', -50)
                         loop_boolean = True
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
-                outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
+                outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
                         'You have Black jack, you win!',
                         'win', '50')
                 loop_boolean = True
         else:
             # Game logic, the dealer has black jack, you automatically lose no matter what.
-            outcome(dealer, p1, dealer_value, p1_value, p1.get_player_wealth(),
+            outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
                     'The dealer has Black jack, you lose!', 'lost', -50)
             loop_boolean = True
 
@@ -119,25 +119,26 @@ def display_player_cards(hand, player_value, player='Your'):
     print(f'[Value: {player_value}]')
 
 
-def outcome(dealer, p1, dealer_value, p1_value, player_wealth, print_prompt, win_lose, outcome_number):
+def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, outcome_number):
     display_player_cards(dealer.get_hand(), dealer_value, 'Their')
     print()
     display_player_cards(p1.get_hand(), p1_value)
     print('\n', print_prompt)
     p1.set_player_wealth(p1.get_player_wealth() + outcome_number)
 
-    print('\nYou',win_lose,' $50 Dollars! You now have $',p1.get_player_wealth(),'dollars!')
+    print('\nYou',win_lose,'$50 Dollars! You now have $',p1.get_player_wealth(),'dollars!')
 
 
 # Choice function that asks for hit or stand and return the choice given by user.
 def choice():
     user = input('\nHit or Stand | Type H or S: ')
-    while True:
+    boolean = True
+    while boolean:
 
         # Try and catch in case the user does input something other than H or S.
         try:
             if user.upper() == 'H' or user.upper() == 'S':
-                break
+                boolean = False
             else:
                 user = input('Not a valid input | Type H or S: ')
         except:
