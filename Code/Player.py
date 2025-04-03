@@ -18,3 +18,5 @@ class Player(Dealer):
     # Setters
     def set_player_wealth(self, player_wealth):
         self.__player_wealth = player_wealth
+        if self._player_wealth < 0:
+            self._player_wealth = 0
