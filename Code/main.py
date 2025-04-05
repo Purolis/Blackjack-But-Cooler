@@ -23,7 +23,8 @@ def main():
         for player in players:
             player.draw(decklist.draw_card())
 
-    game_logic(p1, dealer, decklist, bet)
+    while p1.get_player_wealth() > 0:
+        game_logic(p1, dealer, decklist, bet)
 
 
 def game_logic(p1, dealer, decklist, bet):
@@ -129,6 +130,12 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
     p1.set_player_wealth(p1.get_player_wealth() + bet)
 
     print('\nYou',win_lose, str(bet), '! You now have $',p1.get_player_wealth(),'dollars!')
+
+    if p1.get_player_wealth() <= 0 and len(p1.get_items()) > 0:
+        print(f'You are out of money. You need to sell something in order to continue playing! \n ')
+        print(f'You have these items available to sell:\n {p1.get_items()}')
+        item = input("Which item would you like to sell?")
+        p1.print_item(item)
 
 
 def user_bet():
