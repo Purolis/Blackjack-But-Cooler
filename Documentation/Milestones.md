@@ -64,3 +64,7 @@ Milestones
     -Potentially start a gui
 
     -More security tests
+
+    -Refaactor new code
+
+    -Collect all documentation for week two
