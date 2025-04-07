@@ -34,7 +34,7 @@ Note: It will also work in PyCharm, but won't look as pretty.
 ## Design / Diagrams
 - [Story One](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20One.jpg)
 - [Story Two](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Two.jpg)
-- [Story Three](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Three.jpg)\
+- [Story Three](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Three.jpg)
 - [Story Four](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Four.jpg)
 - [Story Five](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Five.jpg)
 - [UML Diagram](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/Blackjack%20UML.jpg)
