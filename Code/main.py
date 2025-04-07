@@ -12,10 +12,10 @@ def main():
     decklist.shuffle_deck()
 
     # Creates player and dealer and sets base wealth to 1000
-    p1 = Player([], 0, 1000)
+    p1 = Player([], 0, 1000, {"Dog": 750, "Car": 500, "House":2000 })
     dealer = Dealer([], 0)
 
-    bet = user_bet()
+
 
     # Draws 2 cards for both the player and the dealer at the start
     players = [p1, dealer]
@@ -24,6 +24,7 @@ def main():
             player.draw(decklist.draw_card())
 
     while p1.get_player_wealth() > 0:
+        bet = user_bet()
         game_logic(p1, dealer, decklist, bet)
 
 
@@ -122,6 +123,7 @@ def display_player_cards(hand, player_value, player='Your'):
     print(f'[Value: {player_value}]')
 
 
+
 def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
     display_player_cards(dealer.get_hand(), dealer_value, 'Their')
     print()
@@ -130,7 +132,6 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
     p1.set_player_wealth(p1.get_player_wealth() + bet)
 
     print('\nYou',win_lose, str(bet), '! You now have $',p1.get_player_wealth(),'dollars!')
-
     if p1.get_player_wealth() <= 0 and len(p1.get_items()) > 0:
         print(f'You are out of money. You need to sell something in order to continue playing! \n ')
         print(f'You have these items available to sell:\n {p1.get_items()}')
@@ -138,8 +139,9 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
         p1.print_item(item)
 
 
+
 def user_bet():
-    bets = int(input("How much would you like to bet?"))
+    bets = int(input("\nHow much would you like to bet?"))
     return bets
 
 # Choice function that asks for hit or stand and return the choice given by user.
