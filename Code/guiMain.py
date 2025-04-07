@@ -1,4 +1,4 @@
-# This driver is for testing; eventually the GUI will be implemented into main.py
+# TODO: This driver is for testing; eventually the GUI will be implemented into main.py
 
 import pygame, sys
 from Button import Button
@@ -73,14 +73,14 @@ while running:
                             buttons[btn].get_pos_y() <= mouse_pos[1] <= (buttons[btn].get_pos_y() + buttons[btn].get_height()):
                             # 🡹🡹 check if mouse_pos X and Y positions are within button bounds 🡹🡹
                     running = False
-                    # add event handling here;
+                    # TODO: add event handling here;
                             # btn.get_event()
 
     # rendering game elements
     for btn in buttons.keys():
         buttons[btn].render_button(SCREEN)
 
-    # how to handle images; put this into class render method
+    # TODO: this is how to handle images; put this into class render method
     SCREEN.blit(img, (700, 20))
 
     # push frame to screen
