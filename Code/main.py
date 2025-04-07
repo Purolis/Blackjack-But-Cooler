@@ -23,9 +23,23 @@ def main():
         for player in players:
             player.draw(decklist.draw_card())
 
+    print("Welcome to BlackJack!")
+    time.sleep(1)
     while p1.get_player_wealth() > 0:
-        bet = user_bet()
+        bet = user_bet(p1)
+        time.sleep(1.5)
         game_logic(p1, dealer, decklist, bet)
+        time.sleep(1.5)
+        p1.set_hand([])
+        dealer.set_hand([])
+        if decklist.get_deck() is None:
+            decklist.shuffle_deck()
+
+        for x in range(2):
+            for player in players:
+                player.draw(decklist.draw_card())
+
+
 
 
 def game_logic(p1, dealer, decklist, bet):
@@ -140,8 +154,12 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
 
 
 
-def user_bet():
+def user_bet(p1):
+    print("")
     bets = int(input("\nHow much would you like to bet?"))
+    while bets > p1.get_player_wealth():
+        print("You bet more money than you have. Please bet again!")
+        bets = int(input("\nHow much would you like to bet?"))
     return bets
 
 # Choice function that asks for hit or stand and return the choice given by user.
