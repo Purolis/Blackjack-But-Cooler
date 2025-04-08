@@ -3,7 +3,7 @@ class Dealer:
     # Default Variables
     __hand_value = None
     __hand = []
-    __name = ""
+    __name = None
 
     # Initialization
     def __init__(self, hand, hand_value, name):
@@ -51,7 +51,14 @@ class Dealer:
 
     def __str__(self):
         txt = ""
-        txt += "┌─ " + str(self.get_name()) + "'s hand 🡻\n"
+
+        # highlight name if it is the active player
+        if self.get_name() == None:
+            txt += "\033[32m" + "┌─ Your hand  🡻\n"
+        else:
+            txt += "┌─ " + str(self.get_name()) + "'s hand 🡻\n"
+
+
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
 
         hand = self.get_hand()
@@ -60,5 +67,5 @@ class Dealer:
 
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
         txt += "├─ Hand Total: " + str(self.count_hand()) + "\n"
-
+        txt += "└───────────────────────\n\n"
         return txt

@@ -14,6 +14,42 @@ class Player(Dealer):
         self.set_items(items)
 
     # helpers
+    
+    # def count_hand(self):
+    #     super().count_hand()
+
+
+    def sell_item(self):
+        # display options to player
+        print("Choose which item to sell 🡻 (type the full word of the item)")
+        item_list = ""
+        for i in self.get_items():
+            item_list += "├─ " + str(i.title()) + " : $" + str(self.get_value(i)) + "\n"
+        print(item_list)
+
+        # input validation for player selection
+        valid = False
+        choice = None
+        while not valid:
+            try:
+                choice = str(input(": ")).lower()
+            except TypeError:
+                print("DEBUG::TE:: Invalid selection, please choose an item on the list above.")
+                continue
+            else:
+                if choice in self.get_items():
+                    valid = True
+                else:
+                    print("Invalid selection, please choose an item on the list above.")
+        return choice
+
+
+    def bet():
+        # minimum bet: $100
+        # make sure user can't bet more than they have, or negative values
+        # if user is out of money, call sell_item(); maybe put that into main with a check
+        pass
+
     def print_item(self, item):
         print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
         self.set_player_wealth(self.__items.pop(item))
@@ -41,7 +77,12 @@ class Player(Dealer):
     def __str__(self):
         txt = ""
         txt += super().__str__()
-        # txt += "├─ " + str(super().get_name()) + " hand total value: " + str(super().count_hand()) + "\n"
+        txt = txt[:-28] # get rid of end-cap
+        txt += "\n"
         txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
+        txt += "└───────────────────────\n\n"
+
+        # reset text color
+        txt += "\033[0m"
 
         return txt
