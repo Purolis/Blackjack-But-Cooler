@@ -18,7 +18,7 @@ class Player(Dealer):
     # def count_hand(self):
     #     super().count_hand()
 
-    
+
     def sell_item(self):
         # display options to player
         print("Choose which item to sell 🡻 (type the full word of the item)")
@@ -78,7 +78,7 @@ class Player(Dealer):
     def __str__(self):
         txt = ""
         txt += super().__str__()
-        txt = txt[:-28] # get rid of end-cap
+        txt = txt[:-28] # get rid of end-cap to append information
         txt += "\n"
         txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
         txt += "└───────────────────────\n\n"

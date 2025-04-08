@@ -6,6 +6,8 @@ import time
 
 # testing to make sure my changes work and don't cause a Chernobyl-esque disaster
 # this highlights the changes I made
+# main.py WILL have to be refactored quite heavily, I realize, but I believe this is a better direction
+	# that will help massively with the readability of our code.
 
 decklist = Deck([])
 decklist.create_deck()
@@ -20,22 +22,24 @@ starting_items = {
 }
 
 d1 = Dealer([],0,"Dealer")
-p1 = Player([],0,None,0,starting_items)
+p1 = Player([],0,None,0,starting_items) 
+	# name=None 🡸 this indicates that this instance of 'Player' is the person behind the keyboard.
+	# 	this highlights the player's state in a different color to make it easier to understand at a glance.
 
 
 
-# new player state printing
+# new: player state printing
 d1.draw(decklist.draw_card())
 d1.draw(decklist.draw_card())
 
 p1.draw(decklist.draw_card())
 p1.draw(decklist.draw_card())
 
+print()
 print(d1)
 print(p1)
 
-
-print()
+# new: item selling as class method
 print("item testing 🡻")
 print()
 
