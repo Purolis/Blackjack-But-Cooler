@@ -21,22 +21,30 @@ def main():
         for player in players:
             player.draw(decklist.draw_card())
 
+    # Initializaes the actual game
     main_game_init(p1, dealer, decklist, players)
 
 
 def main_game_init(p1, dealer, decklist, players):
+    
+    # Starting introduction
     print("Welcome to BlackJack!")
     print("Current Starting Balance: $" + str(p1.get_player_wealth()))
     time.sleep(1)
+    
+    # While player wealth is not 0 play the game
     while p1.get_player_wealth() > 0:
         bet = user_bet(p1)
         main_game_logic(p1, dealer, decklist, bet)
         time.sleep(5)
         p1.set_hand([])
         dealer.set_hand([])
+        
+        # If the deck ever has no cards shuffle it
         if decklist.get_deck() is None:
             decklist.shuffle_deck()
 
+        # Shows the current balance and deals a new hand
         print("Current Balance: $" + str(p1.get_player_wealth()))
         print("\nDealing new hand....")
         time.sleep(2)
@@ -83,6 +91,7 @@ def main_game_logic(p1, dealer, decklist, bet):
                         loop_boolean = True
 
                 else:
+                    # Apart of the game logic it's just split up
                     loop_boolean = game_logic_split(dealer, p1, decklist, bet, loop_boolean)
 
             else:
