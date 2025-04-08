@@ -18,16 +18,16 @@ class Dealer:
 
     # Counts the number in the hand function
     def count_hand(self):
-        self.__hand_value = 0
+        self.set_hand_value(0)
         for card in self.__hand:
-            self.__hand_value += card.get_value()
+            self.set_hand_value(self.get_hand_value() + card.get_value())
 
-        if self.__hand_value > 21:
-            for card in self.__hand:
+        if self.get_hand_value() > 21:
+            for card in self.get_hand():
                 if card.get_value() == 11:
-                    self.__hand_value -= 10
+                    self.set_hand_value(self.get_hand_value() - 10)
 
-        return self.__hand_value
+        return self.get_hand_value()
 
     # Getters
     def get_hand(self):
@@ -53,7 +53,7 @@ class Dealer:
     def __str__(self):
         txt = ""
 
-        # highlight name if it is the active player
+        # change text color to green if it is the active player, blue if not
         if self.get_name() == None:
             txt += "\033[32m" + "┌─ Your hand  🡻\n"
         else:
@@ -68,5 +68,7 @@ class Dealer:
 
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
         txt += "├─ Hand Total: " + str(self.count_hand()) + "\n"
-        txt += "└───────────────────────\n\n"
+        txt += "└───────────────────────\033[0m\n\n"
+            # \033[0m 🡺 reset text color
+        
         return txt

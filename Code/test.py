@@ -12,8 +12,7 @@ import sys
 
 
 def main(mode="cli"):
-	if mode == "gui":
-		print("gui!")
+	print("mode: " + str(mode))
 
 	decklist = Deck([])
 	decklist.create_deck()
@@ -28,7 +27,7 @@ def main(mode="cli"):
 	}
 
 	d1 = Dealer([],0,"Dealer")
-	user = Player([],0,None,0,starting_items) 
+	user = Player([],0,None,200,starting_items) 
 		# name=None 🡸 this indicates that this instance of 'Player' is the person behind the keyboard.
 		# 	this highlights the player's state in a different color to make it easier to understand at a glance.
 
@@ -43,6 +42,7 @@ def main(mode="cli"):
 
 	print()
 	print(d1)
+	print("test text between states")
 	print(user)
 
 	# new: item selling as class method
@@ -51,6 +51,14 @@ def main(mode="cli"):
 
 	meep = user.sell_item()
 	print(meep)
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
 	# take in command-line arguments, launch as CLI or GUI

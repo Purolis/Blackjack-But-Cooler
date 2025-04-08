@@ -107,12 +107,13 @@ class Player(Dealer):
     def __str__(self):
         txt = ""
         txt += super().__str__()
-        txt = txt[:-28] # get rid of end-cap to append information
+        txt = txt[:-31] # get rid of end-cap to append information
         txt += "\n"
-        txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
-        txt += "└───────────────────────\n\n"
-
-        # reset text color
-        txt += "\033[0m"
+        if self.get_name() is None:
+            txt += "├─ Your Wealth: $" + str(self.get_player_wealth()) + "\n"
+        else:
+            txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
+        txt += "└───────────────────────\033[0m\n\n"
+            # \033[0m 🡺 reset text color
 
         return txt
