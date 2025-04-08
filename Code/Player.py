@@ -4,12 +4,12 @@ from Dealer import Dealer
 class Player(Dealer):
 
     # Default Variables
-    __player_wealth = None
+    __player_wealth = 0
     __items = {}
 
     # Initialization
-    def __init__(self, hand, hand_value, wealth, items):
-        super().__init__(hand, hand_value)
+    def __init__(self, hand, hand_value, name, wealth, items):
+        super().__init__(hand, hand_value, name)
         self.set_player_wealth(wealth)
         self.set_items(items)
 
@@ -22,7 +22,7 @@ class Player(Dealer):
     def get_player_wealth(self):
         return self.__player_wealth
 
-        def get_items(self):
+    def get_items(self):
         return self.__items
 
     def get_value(self, item):
@@ -37,3 +37,11 @@ class Player(Dealer):
 
     def set_items(self, items):
         self.__items = items
+
+    def __str__(self):
+        txt = ""
+        txt += super().__str__()
+        # txt += "├─ " + str(super().get_name()) + " hand total value: " + str(super().count_hand()) + "\n"
+        txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
+
+        return txt

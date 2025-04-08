@@ -3,11 +3,13 @@ class Dealer:
     # Default Variables
     __hand_value = None
     __hand = []
+    __name = ""
 
     # Initialization
-    def __init__(self, hand, hand_value):
+    def __init__(self, hand, hand_value, name):
         self.set_hand(hand)
         self.set_hand_value(hand_value)
+        self.set_name(name)
 
     # Draw a card function
     def draw(self, card):
@@ -34,9 +36,29 @@ class Dealer:
     def get_hand_value(self):
         return self.__hand_value
 
+    def get_name(self):
+        return self.__name
+
     # Setters
     def set_hand(self, hand):
         self.__hand = hand
 
     def set_hand_value(self, hand_value):
         self.__hand_value = hand_value
+
+    def set_name(self, name):
+        self.__name = name
+
+    def __str__(self):
+        txt = ""
+        txt += "┌─ " + str(self.get_name()) + "'s hand 🡻\n"
+        txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
+
+        hand = self.get_hand()
+        for i in range(len(hand)):
+            txt += "├ " + str(hand[i].get_name()) + "\n"
+
+        txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
+        txt += "├─ Hand Total: " + str(self.count_hand()) + "\n"
+
+        return txt
