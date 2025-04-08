@@ -49,6 +49,7 @@ class Dealer:
     def set_name(self, name):
         self.__name = name
 
+    # to_string
     def __str__(self):
         txt = ""
 

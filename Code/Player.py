@@ -34,14 +34,42 @@ class Player(Dealer):
             try:
                 choice = str(input(": ")).lower()
             except TypeError:
-                print("DEBUG::TE:: Invalid selection, please choose an item on the list above.")
-                #TODO: get rid of DEBUG
+                print("Invalid selection (not a string), please choose an item on the list above.")
+                continue
+            except BaseException:
+                print("I'm not sure what you did, but you broke it, congrats.")
+                print("Invalid selection, please choose an item on the list above.")
                 continue
             else:
                 if choice in self.get_items():
                     valid = True
                 else:
                     print("Invalid selection, please choose an item on the list above.")
+
+        if choice == "dog": # shame the user for selling the dog
+            print("""
+▓██   ██▓ ▒█████   █    ██                                       
+ ▒██  ██▒▒██▒  ██▒ ██  ▓██▒                                      
+  ▒██ ██░▒██░  ██▒▓██  ▒██░                                      
+  ░ ▐██▓░▒██   ██░▓▓█  ░██░                                      
+  ░ ██▒▓░░ ████▓▒░▒▒█████▓                                       
+   ██▒▒▒ ░ ▒░▒░▒░ ░▒▓▒ ▒ ▒                                       
+ ▓██ ░▒░   ░ ▒ ▒░ ░░▒░ ░ ░                                       
+ ▒ ▒ ░░  ░ ░ ░ ▒   ░░░ ░ ░                                       
+ ░ ░         ░ ░     ░                                           
+ ░ ░                                                             
+ ███▄ ▄███▓ ▒█████   ███▄    █   ██████ ▄▄▄█████▓▓█████  ██▀███  
+▓██▒▀█▀ ██▒▒██▒  ██▒ ██ ▀█   █ ▒██    ▒ ▓  ██▒ ▓▒▓█   ▀ ▓██ ▒ ██▒
+▓██    ▓██░▒██░  ██▒▓██  ▀█ ██▒░ ▓██▄   ▒ ▓██░ ▒░▒███   ▓██ ░▄█ ▒
+▒██    ▒██ ▒██   ██░▓██▒  ▐▌██▒  ▒   ██▒░ ▓██▓ ░ ▒▓█  ▄ ▒██▀▀█▄  
+▒██▒   ░██▒░ ████▓▒░▒██░   ▓██░▒██████▒▒  ▒██▒ ░ ░▒████▒░██▓ ▒██▒
+░ ▒░   ░  ░░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░  ▒ ░░   ░░ ▒░ ░░ ▒▓ ░▒▓░
+░  ░      ░  ░ ▒ ▒░ ░ ░░   ░ ▒░░ ░▒  ░ ░    ░     ░ ░  ░  ░▒ ░ ▒░
+░      ░   ░ ░ ░ ▒     ░   ░ ░ ░  ░  ░    ░         ░     ░░   ░ 
+       ░       ░ ░           ░       ░              ░  ░   ░                                         
+                """)
+
+
         return choice
 
 
@@ -75,6 +103,7 @@ class Player(Dealer):
     def set_items(self, items):
         self.__items = items
 
+    # to_string
     def __str__(self):
         txt = ""
         txt += super().__str__()
