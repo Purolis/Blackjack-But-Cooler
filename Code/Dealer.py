@@ -56,7 +56,7 @@ class Dealer:
         if self.get_name() == None:
             txt += "\033[32m" + "┌─ Your hand  🡻\n"
         else:
-            txt += "┌─ " + str(self.get_name()) + "'s hand 🡻\n"
+            txt += "\033[94m┌─ " + str(self.get_name()) + "'s hand 🡻\n"
 
 
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"

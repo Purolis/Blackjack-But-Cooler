@@ -14,11 +14,11 @@ class Player(Dealer):
         self.set_items(items)
 
     # helpers
-    
+
     # def count_hand(self):
     #     super().count_hand()
 
-
+    
     def sell_item(self):
         # display options to player
         print("Choose which item to sell 🡻 (type the full word of the item)")
@@ -35,6 +35,7 @@ class Player(Dealer):
                 choice = str(input(": ")).lower()
             except TypeError:
                 print("DEBUG::TE:: Invalid selection, please choose an item on the list above.")
+                #TODO: get rid of DEBUG
                 continue
             else:
                 if choice in self.get_items():
