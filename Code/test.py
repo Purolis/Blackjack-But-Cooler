@@ -28,7 +28,7 @@ def main(mode="cli"):
 	}
 
 	d1 = Dealer([],0,"Dealer")
-	p1 = Player([],0,None,0,starting_items) 
+	user = Player([],0,None,0,starting_items) 
 		# name=None 🡸 this indicates that this instance of 'Player' is the person behind the keyboard.
 		# 	this highlights the player's state in a different color to make it easier to understand at a glance.
 
@@ -38,18 +38,18 @@ def main(mode="cli"):
 	d1.draw(decklist.draw_card())
 	d1.draw(decklist.draw_card())
 
-	p1.draw(decklist.draw_card())
-	p1.draw(decklist.draw_card())
+	user.draw(decklist.draw_card())
+	user.draw(decklist.draw_card())
 
 	print()
 	print(d1)
-	print(p1)
+	print(user)
 
 	# new: item selling as class method
 	print("item testing 🡻")
 	print()
 
-	meep = p1.sell_item()
+	meep = user.sell_item()
 	print(meep)
 
 if __name__ == '__main__':
