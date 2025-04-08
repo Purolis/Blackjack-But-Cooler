@@ -4,6 +4,15 @@ from Dealer import Dealer
 import os
 import time
 
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
+# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
 
 def main():
     # Creates a deck and shuffles the deck
