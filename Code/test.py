@@ -53,7 +53,11 @@ def main(mode="cli"):
 	print(meep)
 
 if __name__ == '__main__':
-	mode = str(sys.argv[1])
-	if mode in ['-gui', '-GUI', '--graphic']:
-		mode = "gui"
-	main(mode)
+	# take in command-line arguments, launch as CLI or GUI
+	if len(sys.argv) > 1:
+		mode = str(sys.argv[1])
+		if mode in ['-gui', '-GUI', '--graphic']:
+			mode = "gui"
+		main(mode)
+	else:
+		main()
