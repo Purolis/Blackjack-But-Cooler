@@ -99,7 +99,7 @@ def main_game_init(decklist, clients, min_bet):
             for x in range(2):
                 for player in clients['player']:
                     player.draw(decklist.draw_card())
-                clients['dealer'].set_hand([])
+                clients['dealer'].draw(decklist.draw_card())
 
 
 def main_game_logic(clients, decklist, bet):
