@@ -20,34 +20,42 @@ class Player(Dealer):
 
 
     def sell_item(self):
-        # display options to player
-        print("Choose which item to sell 🡻 (type the full word of the item)")
-        item_list = ""
-        for i in self.get_items():
-            item_list += "├─ " + str(i.title()) + " : $" + str(self.get_value(i)) + "\n"
-        print(item_list)
+        """
+        returns 0 for successful item sell; -1 for "unable to sell"
+        """
+        # check for empty inventory
+        if self.get_items() == {}:
+            print("You have no items to sell!")
+            return -1 # error code, no items to sell, tell game to quit
+        else:
+            # display options to player
+            print("Choose which item to sell 🡻 (type the full word of the item)")
+            item_list = ""
+            for i in self.get_items():
+                item_list += "├─ " + str(i.title()) + " : $" + str(self.get_value(i)) + "\n"
+            print(item_list)
 
-        # input validation for player selection
-        valid = False
-        choice = None
-        while not valid:
-            try:
-                choice = str(input(": ")).lower()
-            except TypeError:
-                print("Invalid selection (not a string), please choose an item on the list above.")
-                continue
-            except BaseException:
-                print("I'm not sure what you did, but you broke it, congrats.")
-                print("Invalid selection, please choose an item on the list above.")
-                continue
-            else:
-                if choice in self.get_items():
-                    valid = True
-                else:
+            # input validation for player selection
+            valid = False
+            choice = None
+            while not valid:
+                try:
+                    choice = str(input(": ")).lower()
+                except TypeError:
+                    print("Invalid selection (not a string), please choose an item on the list above.")
+                    continue
+                except BaseException:
+                    print("I'm not sure what you did, but you broke it, congrats.")
                     print("Invalid selection, please choose an item on the list above.")
+                    continue
+                else:
+                    if choice in self.get_items():
+                        valid = True
+                    else:
+                        print("Invalid selection, please choose an item on the list above.")
 
-        if choice == "dog": # shame the user for selling the dog
-            print("""
+            if choice == "dog": # shame the user for selling the dog
+                print("""\033[38;5;9m
 ▓██   ██▓ ▒█████   █    ██                                       
  ▒██  ██▒▒██▒  ██▒ ██  ▓██▒                                      
   ▒██ ██░▒██░  ██▒▓██  ▒██░                                      
@@ -67,13 +75,21 @@ class Player(Dealer):
 ░  ░      ░  ░ ▒ ▒░ ░ ░░   ░ ▒░░ ░▒  ░ ░    ░     ░ ░  ░  ░▒ ░ ▒░
 ░      ░   ░ ░ ░ ▒     ░   ░ ░ ░  ░  ░    ░         ░     ░░   ░ 
        ░       ░ ░           ░       ░              ░  ░   ░                                         
-                """)
+                \033[0m""")
 
+            # update player wealth and items
+            new_items = self.get_items()
+            gained_wealth = new_items[choice]
+            print("Gained wealth: $"+str(gained_wealth))
 
-        return choice
+            self.set_player_wealth(self.get_player_wealth()+gained_wealth)
 
+            del(new_items[choice])
+            self.set_items(new_items)
+            print("New wealth total: $"+str(self.get_player_wealth()))
+            return 0 # ran without issue
 
-    def bet():
+    def bet(minimum=0):
         # minimum bet: $100
         # make sure user can't bet more than they have, or negative values
         # if user is out of money, call sell_item(); maybe put that into main with a check

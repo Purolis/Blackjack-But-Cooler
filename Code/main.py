@@ -4,15 +4,6 @@ from Dealer import Dealer
 import os
 import time
 
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
-# NOTE: THIS IS BROKEN, RUN test.py TO SEE WHAT I'M DOING
 
 def main():
     # Creates a deck and shuffles the deck
@@ -21,7 +12,7 @@ def main():
     decklist.shuffle_deck()
 
     # Creates player and dealer and sets base wealth to 1000
-    p1 = Player([], 0, 1000, {"Dog": 750, "Car": 500, "House":2000 })
+    p1 = Player([], 0, 1000, {"Dog": 750, "Car": 500, "House": 2000})
     dealer = Dealer([], 0)
 
     # Draws 2 cards for both the player and the dealer at the start
@@ -30,26 +21,40 @@ def main():
         for player in players:
             player.draw(decklist.draw_card())
 
+    # Initializaes the actual game
+    main_game_init(p1, dealer, decklist, players)
+
+
+def main_game_init(p1, dealer, decklist, players):
+    
+    # Starting introduction
     print("Welcome to BlackJack!")
+    print("Current Starting Balance: $" + str(p1.get_player_wealth()))
     time.sleep(1)
+    
+    # While player wealth is not 0 play the game
     while p1.get_player_wealth() > 0:
         bet = user_bet(p1)
-        time.sleep(1.5)
-        game_logic(p1, dealer, decklist, bet)
-        time.sleep(1.5)
+        main_game_logic(p1, dealer, decklist, bet)
+        time.sleep(5)
         p1.set_hand([])
         dealer.set_hand([])
+        
+        # If the deck ever has no cards shuffle it
         if decklist.get_deck() is None:
             decklist.shuffle_deck()
+
+        # Shows the current balance and deals a new hand
+        print("Current Balance: $" + str(p1.get_player_wealth()))
+        print("\nDealing new hand....")
+        time.sleep(2)
 
         for x in range(2):
             for player in players:
                 player.draw(decklist.draw_card())
 
 
-
-
-def game_logic(p1, dealer, decklist, bet):
+def main_game_logic(p1, dealer, decklist, bet):
     loop_boolean = False
     # While choice is still going
     while not loop_boolean:
@@ -58,7 +63,7 @@ def game_logic(p1, dealer, decklist, bet):
 
         # Count's the hand value
         p1.set_hand_value(p1.count_hand())
-        dealer.set_hand_value(p1.count_hand())
+        dealer.set_hand_value(dealer.count_hand())
 
         # If statements for game logic.
         if dealer.get_hand_value() != 21:
@@ -86,43 +91,9 @@ def game_logic(p1, dealer, decklist, bet):
                         loop_boolean = True
 
                 else:
+                    # Apart of the game logic it's just split up
+                    loop_boolean = game_logic_split(dealer, p1, decklist, bet, loop_boolean)
 
-                    # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
-                    while dealer.get_hand_value() < 17:
-                        time.sleep(1.5)
-                        os.system('cls' if os.name == 'nt' else 'clear')
-
-                        dealer.draw(decklist.draw_card())
-                        dealer.set_hand_value(dealer.count_hand())
-
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        display_player_cards(dealer.get_hand(), dealer.get_hand_value(), 'Their')
-                        print()
-                        display_player_cards(p1.get_hand(), p1.get_hand_value())
-
-                    os.system('cls' if os.name == 'nt' else 'clear')
-
-                    # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
-                    if dealer.get_hand_value() > 21:
-                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
-                                '\nDealer busts, you win!', 'won', bet)
-                        loop_boolean = True
-
-                    # Game logic, if you have a higher value than dealer at the end of all of this, you win!
-                    if p1.get_hand_value() > dealer.get_hand_value() and p1.get_hand_value() < 21:
-                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
-                                f'\n{p1.get_hand_value()} beats {dealer.get_hand_value()}, you win!', 'win', bet)
-
-                    # Game logic, if you have the same values, you push or tie.
-                    elif p1.get_hand_value() == dealer.get_hand_value():
-                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
-                                f'\n{p1.get_hand_value()} ties {dealer.get_hand_value()}, you push!', 'pushed', 0)
-                    if p1.get_hand_value() < dealer.get_hand_value() and dealer.get_hand_value() < 21:
-
-                        # Game logic, else you will therefore have nothing but less than them so you lose.
-                        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
-                                f'\n{p1.get_hand_value()} loses to {dealer.get_hand_value()}, you lose!', 'lost', -bet)
-                        loop_boolean = True
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
                 outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
@@ -140,9 +111,52 @@ def game_logic(p1, dealer, decklist, bet):
 def display_player_cards(hand, player_value, player='Your'):
     print(f'{player} Hand:')
     for card in hand:
-        print(f'\t[{card.get_name()}]', end='\n')
-    print(f'[Hand Value: {player_value}]')
+        print(f'[{card.get_name()}]', end=' ')
+    print(f'[Value: {player_value}]')
 
+
+def dealer_17_logic(dealer, p1, decklist):
+    # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
+    while dealer.get_hand_value() < 17:
+        time.sleep(1.5)
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        dealer.draw(decklist.draw_card())
+        dealer.set_hand_value(dealer.count_hand())
+
+        os.system('cls' if os.name == 'nt' else 'clear')
+        display_player_cards(dealer.get_hand(), dealer.get_hand_value(), 'Their')
+        print()
+        display_player_cards(p1.get_hand(), p1.get_hand_value())
+
+
+def game_logic_split(dealer, p1, decklist, bet, loop_boolean):
+    dealer_17_logic(dealer, p1, decklist)
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+    # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
+    if dealer.get_hand_value() > 21:
+        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                '\nDealer busts, you win!', 'won', bet)
+        loop_boolean = True
+
+    # Game logic, if you have a higher value than dealer at the end of all of this, you win!
+    if p1.get_hand_value() > dealer.get_hand_value() and p1.get_hand_value() < 21:
+        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                f'\n{p1.get_hand_value()} beats {dealer.get_hand_value()}, you win!', 'win', bet)
+
+    # Game logic, if you have the same values, you push or tie.
+    elif p1.get_hand_value() == dealer.get_hand_value():
+        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                f'\n{p1.get_hand_value()} ties {dealer.get_hand_value()}, you push!', 'pushed', 0)
+
+    # Game logic, if if dealer has more than you and is less than 21
+    if p1.get_hand_value() < dealer.get_hand_value() and dealer.get_hand_value() < 21:
+        # Game logic, else you will therefore have nothing but less than them so you lose.
+        outcome(dealer, p1, dealer.get_hand_value(), p1.get_hand_value(),
+                f'\n{p1.get_hand_value()} loses to {dealer.get_hand_value()}, you lose!', 'lost', -bet)
+        loop_boolean = True
+    return loop_boolean
 
 
 def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
@@ -152,7 +166,7 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
     print('\n', print_prompt)
     p1.set_player_wealth(p1.get_player_wealth() + bet)
 
-    print('\nYou',win_lose, str(bet), '! You now have $',p1.get_player_wealth(),'dollars!')
+    print('\nYou', win_lose, str(bet), '! You now have $', p1.get_player_wealth(), 'dollars!')
     if p1.get_player_wealth() <= 0 and len(p1.get_items()) > 0:
         print(f'You are out of money. You need to sell something in order to continue playing! \n ')
         print(f'You have these items available to sell:\n {p1.get_items()}')
@@ -160,14 +174,15 @@ def outcome(dealer, p1, dealer_value, p1_value, print_prompt, win_lose, bet):
         p1.print_item(item)
 
 
-
+# Function that allows the user to bet and returns that bet
 def user_bet(p1):
     print("")
-    bets = int(input("\nHow much would you like to bet?"))
+    bets = int(input("How much would you like to bet: "))
     while bets > p1.get_player_wealth():
         print("You bet more money than you have. Please bet again!")
-        bets = int(input("\nHow much would you like to bet?"))
+        bets = int(input("\nHow much would you like to bet: "))
     return bets
+
 
 # Choice function that asks for hit or stand and return the choice given by user.
 def choice():

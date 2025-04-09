@@ -14,6 +14,33 @@ import sys
 def main(mode="cli"):
 	print("mode: " + str(mode))
 
+	running = True
+	while running:
+		choice = str(input("""
+test menu:
+1) toString test
+2) item test
+x) exit
+
+:"""))
+		match(choice):
+			case "1":
+				print("toString test!"+("-"*10)+"\n\n")
+				toString_test()
+			case "2":
+				print("item test!"+("-"*10)+"\n\n")
+				item_test()
+			case _:
+				print("exiting...\n")
+				running = False
+	exit()
+
+	
+
+
+	
+
+def toString_test():
 	decklist = Deck([])
 	decklist.create_deck()
 	decklist.shuffle_deck()
@@ -31,8 +58,6 @@ def main(mode="cli"):
 		# name=None 🡸 this indicates that this instance of 'Player' is the person behind the keyboard.
 		# 	this highlights the player's state in a different color to make it easier to understand at a glance.
 
-
-
 	# new: player state printing
 	d1.draw(decklist.draw_card())
 	d1.draw(decklist.draw_card())
@@ -42,22 +67,25 @@ def main(mode="cli"):
 
 	print()
 	print(d1)
-	print("test text between states")
 	print(user)
+
+
+def item_test():
+	starting_items = {
+		"house": 170_000,
+		"car": 25_000,
+		"shoes": 90,
+		"the shirt off your back": 10,
+		"dog": 300,
+	}
+
+	user = Player([],0,None,200,starting_items) 
 
 	# new: item selling as class method
 	print("item testing 🡻")
 	print()
 
-	meep = user.sell_item()
-	print(meep)
-
-
-
-
-
-
-
+	user.sell_item()
 
 
 if __name__ == '__main__':
