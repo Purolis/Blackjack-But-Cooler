@@ -131,14 +131,16 @@ class Player(Dealer):
             print("You now have $"+str(self.get_player_wealth())+" in your account.")
             return choice # betting worked properly, return bet amount and continue to next hand
 
-
-        
-
     def print_item(self, item):
         print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
         self.set_player_wealth(self.__items.pop(item))
 
-    # Getters
+    def get_hand(self):
+        return self.__hand
+
+    def get_hand_value(self):
+        return self.__hand_value
+
     def get_player_wealth(self):
         return self.__player_wealth
 
@@ -151,9 +153,14 @@ class Player(Dealer):
     def get_all_items(self):
         return len(self.__items)
 
-    # Setters
-    def set_player_wealth(self, player_wealth):
-        self.__player_wealth = player_wealth
+    def set_hand(self, hand):
+        self.__hand = hand
+
+    def set_hand_value(self, hand_value):
+        self.__hand_value = hand_value
+
+    def set_player_wealth(self, cash):
+        self.__player_wealth = cash
 
     def set_items(self, items):
         self.__items = items

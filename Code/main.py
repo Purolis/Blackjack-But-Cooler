@@ -24,7 +24,6 @@ def main():
         "shirt": 15,
     }
     # Creates player and dealer and sets base wealth to 1000
-
     global p1
     global p2
     global dealer

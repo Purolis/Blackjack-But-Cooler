@@ -29,10 +29,14 @@ Note: It will also work in PyCharm, but won't look as pretty.
 - [Rough Idea](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Rough%20Idea.md)
 - [Milestones](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Milestones.md)
 - [Executive Summary](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Executive%20Summary.md)
+- [Requirements](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Requirements%20.md)
 
 ## Design / Diagrams
 - [Story One](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20One.jpg)
 - [Story Two](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Two.jpg)
+- [Story Three](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Three.jpg)
+- [Story Four](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Four.jpg)
+- [Story Five](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Five.jpg)
 - [UML Diagram](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/Blackjack%20UML.jpg)
 
 
