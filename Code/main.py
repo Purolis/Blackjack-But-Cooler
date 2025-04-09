@@ -24,78 +24,95 @@ def main():
         "shirt": 15,
     }
     # Creates player and dealer and sets base wealth to 1000
-    p1 = Player([], 0, None, 1000, starting_items)
-    dealer = Dealer([], 0, "Dealer")
-    p2 = Dealer([], 0, "CPU1")
 
+    global p1
+    global p2
+    global dealer
+    p1 = Player([], 0, None, 1000, starting_items)
+    p2 = Dealer([], 0, "CPU1")
+    dealer = Dealer([], 0, "Dealer")
+
+    
     # Draws 2 cards for both the player and the dealer at the start
-    players = [p1, dealer, p2]
-    for x in range(2):
-        for player in players:
-            player.draw(decklist.draw_card())
+    clients = {
+        "player": [p1, p2], 
+        "dealer": dealer,
+        }
+
+    clients['player'][0].draw(decklist.draw_card())
+    clients['player'][1].draw(decklist.draw_card())
+    clients['dealer'].draw(decklist.draw_card())
+
 
     # Initializaes the actual game
-    main_game_init(p1, p2, dealer, decklist, players, minimum_bet)
+    main_game_init(decklist, clients, minimum_bet)
 
 
-def main_game_init(p1, p2, dealer, decklist, players, min_bet):
+def main_game_init(decklist, clients, min_bet):
 
     # Starting introduction
     print("Welcome to BlackJack!")
-            # print("Current Starting Balance: $" + str(p1.get_player_wealth()))
     time.sleep(0.8)
 
-    # While player wealth is not 0 play the game
-    # while p1.get_player_wealth() > min_bet:
-    bet_made = False
-    while not bet_made:
-        bet = p1.bet(min_bet)
-        if bet == -1: 
-            # if a bet cannot be made, sell an item
-            did_sell = p1.sell_item()
-            if did_sell == -1: 
-                # no items to sell, game over
-                print("\n\n\tYou Lose!\n\tGame Over\n\tThank you for playing!\n")
-                exit()
-        else:
-            bet_made = True
+    running = True
+    while running:
 
         # first bet
+        bet_made = False
+        while not bet_made:
+            print("DEBUG:: betting1")
+            bet = clients['player'][0].bet(min_bet)
+            if bet == -1: 
+                print("DEBUG:: not enough money, sell")
+                # if a bet cannot be made, sell an item
+                did_sell = clients['player'][0].sell_item()
+                if did_sell == -1: 
+                    print("DEBUG:: nothing to sell")
+                    # no items to sell, game over
+                    print("\n\n\tYou Lose!\n\tGame Over\n\tThank you for playing!\n")
+                    exit()
+                else:
+                    continue
+            else:
+                print("DEBUG:: locked in bet")
+                bet_made = True
 
 
+            main_game_logic(clients, decklist, bet)
+            time.sleep(2)
+            for p in clients['player']:
+                p.set_hand([])
+            clients['dealer'].set_hand([])
+            # p1.set_hand([])
+            # p2.set_hand([])
+            # dealer.set_hand([])
 
-        # bet = user_bet(p1)
-        main_game_logic(p1, p2, dealer, decklist, bet)
-        time.sleep(5)
-        p1.set_hand([])
-        p2.set_hand([])
-        dealer.set_hand([])
+            # If the deck ever has no cards shuffle it
+            if decklist.get_deck() is None:
+                decklist.shuffle_deck()
 
-        # If the deck ever has no cards shuffle it
-        if decklist.get_deck() is None:
-            decklist.shuffle_deck()
+            # Shows the current balance and deals a new hand
+            print("Current Balance: $" + str(p1.get_player_wealth()))
+            print("\nDealing new hand....")
+            time.sleep(2)
 
-        # Shows the current balance and deals a new hand
-        print("Current Balance: $" + str(p1.get_player_wealth()))
-        print("\nDealing new hand....")
-        time.sleep(2)
-
-        for x in range(2):
-            for player in players:
-                player.draw(decklist.draw_card())
+            for x in range(2):
+                for player in clients['player']:
+                    player.draw(decklist.draw_card())
+                clients['dealer'].set_hand([])
 
 
-def main_game_logic(p1, p2, dealer, decklist, bet):
+def main_game_logic(clients, decklist, bet):
     loop_boolean = False
     # While choice is still going
     while not loop_boolean:
         # os clears are just to make output look nice in command line,
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # os.system('cls' if os.name == 'nt' else 'clear')
 
         # Count's the hand value
-        p1.set_hand_value(p1.count_hand())
-        p2.set_hand_value(p2.count_hand())
-        dealer.set_hand_value(dealer.count_hand())
+        clients['player'][0].set_hand_value(p1.count_hand())
+        clients['player'][1].set_hand_value(p2.count_hand())
+        clients['dealer'].set_hand_value(dealer.count_hand())
 
         # If statements for game logic.
         if dealer.get_hand_value() != 21:
@@ -121,14 +138,21 @@ def main_game_logic(p1, p2, dealer, decklist, bet):
 
                     # Game logic, if hand value is over 21 you lose automatically.
                     if p1.get_hand_value() > 21:
-                        os.system('cls' if os.name == 'nt' else 'clear')
+                        # os.system('cls' if os.name == 'nt' else 'clear')
                         outcome(dealer, p1, p2, p2.get_hand_value(),  dealer.get_hand_value(), p1.get_hand_value(),
                                 '\nYou busted, you lose!', 'lost', -bet)
                         loop_boolean = True
 
                 else:
                     # Apart of the game logic it's just split up
-                    loop_boolean = game_logic_split(dealer, p1, p2, decklist, bet, loop_boolean)
+                    loop_boolean = game_logic_split(
+                        clients['dealer'], 
+                        clients['player'][0], 
+                        clients['player'][1], 
+                        decklist, 
+                        bet, 
+                        loop_boolean
+                    )
 
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
@@ -155,12 +179,12 @@ def dealer_17_logic(dealer, p1, p2, decklist):
     # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
     while dealer.get_hand_value() < 17:
         time.sleep(1.5)
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # os.system('cls' if os.name == 'nt' else 'clear')
 
         dealer.draw(decklist.draw_card())
         dealer.set_hand_value(dealer.count_hand())
 
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # os.system('cls' if os.name == 'nt' else 'clear')
         display_player_cards(p2.get_hand(), p2.get_hand_value(), 'P2')
         print()
         display_player_cards(dealer.get_hand(), dealer.get_hand_value(), 'Dealer')
@@ -170,7 +194,7 @@ def dealer_17_logic(dealer, p1, p2, decklist):
 
 def game_logic_split(dealer, p1, p2, decklist, bet, loop_boolean):
     dealer_17_logic(dealer, p1, p2, decklist)
-    os.system('cls' if os.name == 'nt' else 'clear')
+    # os.system('cls' if os.name == 'nt' else 'clear')
 
     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
     if dealer.get_hand_value() > 21:
