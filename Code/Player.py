@@ -168,7 +168,7 @@ class Player(Dealer):
             txt += "├─ Your Wealth: $" + str(self.get_player_wealth()) + "\n"
         else:
             txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
-        txt += "└───────────────────────\033[0m\n\n"
+        txt += "└───────────────────────\033[0m\n"
             # \033[0m 🡺 reset text color
 
         return txt
