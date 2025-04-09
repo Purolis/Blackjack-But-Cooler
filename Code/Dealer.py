@@ -14,7 +14,7 @@ class Dealer:
     # Draw a card function
     def draw(self, card):
         self.__hand.append(card)
-        return self.__hand
+        # return self.__hand
 
     # Counts the number in the hand function
     def count_hand(self):
@@ -64,7 +64,7 @@ class Dealer:
 
         hand = self.get_hand()
         for i in range(len(hand)):
-            txt += "├ " + str(hand[i].get_name()) + "\n"
+            txt += "├ " + str(hand[i].get_card_name()) + "\n"
 
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
         txt += "├─ Hand Total: " + str(self.count_hand()) + "\n"
