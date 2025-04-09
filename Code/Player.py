@@ -127,8 +127,7 @@ class Player(Dealer):
                         valid = True
 
             print("You bet $" + str(choice))
-            self.set_player_wealth(self.get_player_wealth() - choice)
-            print("You now have $" + str(self.get_player_wealth()) + " in your account.")
+            print("You now have $" + str(self.get_player_wealth() - choice) + " in your account.")
             return choice  # betting worked properly, return bet amount and continue to next hand
 
     def print_item(self, item):
@@ -161,7 +160,7 @@ class Player(Dealer):
         txt += super().__str__()
         if self.get_name() is None:
             txt = txt[:-29]  # get rid of end-cap to append information
-            txt += "\033[32m" + "├─ Your Wealth: $" + str(self.get_player_wealth()) + "\n"
+            txt += "\033[32m" + "├─ Your Total Wealth: $" + str(self.get_player_wealth()) + "\n"
         else:
             txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
         txt += "└───────────────────────\033[0m\n"
