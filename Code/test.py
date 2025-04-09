@@ -20,6 +20,7 @@ def main(mode="cli"):
 test menu:
 1) toString test
 2) item test
+3) bet test
 x) exit
 
 :"""))
@@ -30,6 +31,9 @@ x) exit
 			case "2":
 				print("item test!"+("-"*10)+"\n\n")
 				item_test()
+			case "3":
+				print("item test!"+("-"*10)+"\n\n")
+				bet_test()
 			case _:
 				print("exiting...\n")
 				running = False
@@ -38,7 +42,11 @@ x) exit
 	
 
 
-	
+def bet_test():
+	d1 = Dealer([],0,"Dealer")
+	user = Player([],0,None,200,{"foo":10}) 
+	user.bet()
+
 
 def toString_test():
 	decklist = Deck([])

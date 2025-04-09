@@ -1,5 +1,5 @@
 from Dealer import Dealer
-
+from Colors import Colors
 
 class Player(Dealer):
 
@@ -44,6 +44,9 @@ class Player(Dealer):
                 except TypeError:
                     print("Invalid selection (not a string), please choose an item on the list above.")
                     continue
+                except KeyboardInterrupt:
+                    print("\nquitting...")
+                    exit()
                 except BaseException:
                     print("I'm not sure what you did, but you broke it, congrats.")
                     print("Invalid selection, please choose an item on the list above.")
@@ -55,7 +58,7 @@ class Player(Dealer):
                         print("Invalid selection, please choose an item on the list above.")
 
             if choice == "dog": # shame the user for selling the dog
-                print("""\033[38;5;9m
+                print(Colors.red+"""
 ▓██   ██▓ ▒█████   █    ██                                       
  ▒██  ██▒▒██▒  ██▒ ██  ▓██▒                                      
   ▒██ ██░▒██░  ██▒▓██  ▒██░                                      
@@ -75,7 +78,7 @@ class Player(Dealer):
 ░  ░      ░  ░ ▒ ▒░ ░ ░░   ░ ▒░░ ░▒  ░ ░    ░     ░ ░  ░  ░▒ ░ ▒░
 ░      ░   ░ ░ ░ ▒     ░   ░ ░ ░  ░  ░    ░         ░     ░░   ░ 
        ░       ░ ░           ░       ░              ░  ░   ░                                         
-                \033[0m""")
+                """+Colors.reset)
 
             # update player wealth and items
             new_items = self.get_items()
@@ -89,11 +92,46 @@ class Player(Dealer):
             print("New wealth total: $"+str(self.get_player_wealth()))
             return 0 # ran without issue
 
-    def bet(minimum=0):
+    def bet(self, minimum=100):
         # minimum bet: $100
         # make sure user can't bet more than they have, or negative values
         # if user is out of money, call sell_item(); maybe put that into main with a check
-        pass
+        print("DEBUG:: bet()")
+
+        if self.get_player_wealth() < minimum:
+            print(Colors.red+"You don't have enough money to make the minimum bet!"+Colors.reset)
+            print("You must sell an item to continue playing.")
+            return -1 # user is poor, sell items then retry
+        
+        valid = False
+        while not valid:
+            print("\nYou have $"+str(self.get_player_wealth()))
+            print("Minimum bet: $"+str(minimum))
+            try:
+                choice = int(input("How much would you like to bet? : $"))
+            except (TypeError, ValueError):
+                print("Please enter an integer dollar ammount.")
+            except KeyboardInterrupt:
+                print("\nquitting...")
+                exit()
+            except BaseException as e:
+                print("Not sure what you did, but you broke it!")
+            else:
+                if choice > self.get_player_wealth():
+                    print("That's more money than you have!")
+                elif choice < 0:
+                    print("Bet amount must be positive.")
+                elif choice < minimum:
+                    print("You must at least bet the minimum bet. ($"+str(minimum)+")")
+                else:
+                    valid = True
+        
+        print("You bet $"+str(choice))
+        self.set_player_wealth(self.get_player_wealth()-choice)
+        print("You now have $"+str(self.get_player_wealth())+" in your account.")
+
+
+        
 
     def print_item(self, item):
         print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
