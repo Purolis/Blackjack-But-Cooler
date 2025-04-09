@@ -120,14 +120,14 @@ def main_game_logic(clients, decklist, bet):
             while clients['player'][1].get_hand_value() < 17:
                 clients['player'][1].draw(decklist.draw_card())
                 clients['player'][1].set_hand_value(clients['player'][1].count_hand())
-            display_player_cards(clients['player'][1].get_hand(), clients['player'][1].get_hand_value(), "P2")
+            display_player_cards(clients['player'][1])
 
             # If dealer doesn't have Blackjack, move forward and display the hands
             if clients['player'][0].get_hand_value() != 21 or clients['player'][0].get_hand_value() == 21 and len(clients['player'][0].get_hand()) > 2:
-                print('Dealer Hand:')
-                print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
-                print(f'[]\n')
-                display_player_cards(clients['player'][0].get_hand(), clients['player'][0].get_hand_value())
+                print(clients['dealer'])
+                # print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
+                # print(f'[]\n')
+                display_player_cards(clients['player'][0])
                 user_choice = choice()
 
                 # User input for stand or hit, if hit move forward
@@ -147,9 +147,10 @@ def main_game_logic(clients, decklist, bet):
                 else:
                     # Apart of the game logic it's just split up
                     loop_boolean = game_logic_split(
-                        clients['dealer'], 
-                        clients['player'][0], 
-                        clients['player'][1], 
+                        # clients['dealer'], 
+                        # clients['player'][0], 
+                        # clients['player'][1], 
+                        clients,
                         decklist, 
                         bet, 
                         loop_boolean
@@ -169,32 +170,34 @@ def main_game_logic(clients, decklist, bet):
 
 
 # Function that neatly displays the cards in [example card] [example card]
-def display_player_cards(hand, player_value, player='Your'):
-    print(f'{player} Hand:')
-    for card in hand:
-        print(f'[{card.get_name()}]', end=' ')
-    print(f'[Value: {player_value}]')
+def display_player_cards(player):
+    print(player)
+    # print(f'{player} Hand:')
+    # for card in hand:
+    #     print(f'[{card.get_name()}]', end=' ')
+    # print(f'[Value: {player_value}]')
 
 
-def dealer_17_logic(dealer, p1, p2, decklist):
+def dealer_17_logic(clients, decklist):
     # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
-    while dealer.get_hand_value() < 17:
+    while clients['dealer'].get_hand_value() < 17:
         time.sleep(1.5)
         # os.system('cls' if os.name == 'nt' else 'clear')
 
-        dealer.draw(decklist.draw_card())
-        dealer.set_hand_value(dealer.count_hand())
+        clients['dealer'].draw(decklist.draw_card())
+        clients['dealer'].set_hand_value(clients['dealer'].count_hand())
 
         # os.system('cls' if os.name == 'nt' else 'clear')
-        display_player_cards(p2.get_hand(), p2.get_hand_value(), 'P2')
+        print("DEBUG "+str(clients['player'][1]))
+        display_player_cards(clients['player'][1])
         print()
-        display_player_cards(dealer.get_hand(), dealer.get_hand_value(), 'Dealer')
+        display_player_cards(clients['dealer'])
         print()
-        display_player_cards(p1.get_hand(), p1.get_hand_value())
+        display_player_cards(clients['player'][0])
 
 
-def game_logic_split(dealer, p1, p2, decklist, bet, loop_boolean):
-    dealer_17_logic(dealer, p1, p2, decklist)
+def game_logic_split(clients, decklist, bet, loop_boolean):
+    dealer_17_logic(clients, decklist)
     # os.system('cls' if os.name == 'nt' else 'clear')
 
     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
@@ -224,11 +227,11 @@ def game_logic_split(dealer, p1, p2, decklist, bet, loop_boolean):
 
 def outcome(dealer, p1, p2, p2_value, dealer_value, p1_value, print_prompt, win_lose, bet):
     print()
-    display_player_cards(p2.get_hand(), p2_value, 'P2')
+    display_player_cards(p2)
     print()
-    display_player_cards(dealer.get_hand(), dealer_value, 'Dealer')
+    display_player_cards(dealer)
     print()
-    display_player_cards(p1.get_hand(), p1_value)
+    display_player_cards(p1)
     print('\n', print_prompt)
     p1.set_player_wealth(p1.get_player_wealth() + bet)
 
