@@ -89,7 +89,7 @@ def main_game_init(decklist, clients, min_bet):
                 decklist.shuffle_deck()
 
             # Shows the current balance and deals a new hand
-            print("Current Balance: $" + str(p1.get_player_wealth()))
+            print("Current Balance: $" + str(clients['player'][0].get_player_wealth()))
             print("\nDealing new hand....")
             time.sleep(1)
 
@@ -136,8 +136,7 @@ def main_game_logic(clients, decklist, bet):
                     # Game logic, if hand value is over 21 you lose automatically.
                     if clients['player'][0].get_hand_value() > 21:
                         # os.system('cls' if os.name == 'nt' else 'clear')
-                        outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(),  dealer.get_hand_value(), clients['player'][0].get_hand_value(),
-                                '\nYou busted, you lose!', 'lost', -bet)
+                        outcome(clients, '\nYou busted, you lose!', 'lost', -bet)
                         loop_boolean = True
 
                 else:
@@ -151,14 +150,11 @@ def main_game_logic(clients, decklist, bet):
 
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
-                outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(),  dealer.get_hand_value(), clients['player'][0].get_hand_value(),
-                        'You have Black jack, you win!',
-                        'win ', bet)
+                outcome(clients, 'You have Black jack, you win!', 'win ', bet)
                 loop_boolean = True
         else:
             # Game logic, the dealer has black jack, you automatically lose no matter what.
-            outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(), dealer.get_hand_value(), clients['player'][0].get_hand_value(),
-                    'The dealer has Black jack, you lose!', 'lost', -bet)
+            outcome(clients, 'The dealer has Black jack, you lose!', 'lost', -bet)
             loop_boolean = True
 
 
@@ -195,36 +191,38 @@ def game_logic_split(clients, decklist, bet, loop_boolean):
 
     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
     if clients['dealer'].get_hand_value() > 21:
-        outcome(clients, clients['player'][1].get_hand_value(), clients['dealer'].get_hand_value(), clients['player'][0].get_hand_value(),
-                '\nDealer busts, you win!', 'won', bet)
+        outcome(clients, '\nDealer busts, you win!', 'won', bet)
         loop_boolean = True
 
     # Game logic, if you have a higher value than dealer at the end of all of this, you win!
     if clients['player'][0].get_hand_value() > clients['dealer'].get_hand_value() and clients['player'][0].get_hand_value() < 21:
-        outcome(clients['dealer'], clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(), clients['dealer'].get_hand_value(), clients['player'][0].get_hand_value(),
-                f'\n{clients['player'][0].get_hand_value()} beats {clients['dealer'].get_hand_value()}, you win!', 'win', bet)
+        outcome(clients, 'you win!', 'win', bet)
+                # f'\n{clients['player'][0].get_hand_value()} beats {clients['dealer'].get_hand_value()}, you win!', 'win', bet)
 
     # Game logic, if you have the same values, you push or tie.
     elif clients['player'][0].get_hand_value() == clients['dealer'].get_hand_value():
-        outcome(clients['dealer'], clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(), clients['dealer'].get_hand_value(), clients['player'][0].get_hand_value(),
-                f'\n{clients['player'][0].get_hand_value()} ties {clients['dealer'].get_hand_value()}, you push!', 'pushed', 0)
+        outcome(clients, f'\n{clients['player'][0].get_hand_value()} ties {clients['dealer'].get_hand_value()}, you push!', 'pushed', 0)
 
     # Game logic, if if dealer has more than you and is less than 21
     if clients['player'][0].get_hand_value() < clients['dealer'].get_hand_value() and clients['dealer'].get_hand_value() < 21:
         # Game logic, else you will therefore have nothing but less than them so you lose.
-        outcome(clients['dealer'], clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(), clients['dealer'].get_hand_value(), clients['player'][0].get_hand_value(),
-                f'\n{clients['player'][0].get_hand_value()} loses to {clients['dealer'].get_hand_value()}, you lose!', 'lost', -bet)
+        outcome(clients, f'\n{clients['player'][0].get_hand_value()} loses to {clients['dealer'].get_hand_value()}, you lose!', 'lost', -bet)
         loop_boolean = True
     return loop_boolean
 
 
-def outcome(clients, p2_value, dealer_value, p1_value, print_prompt, win_lose, bet):
+def outcome(clients, print_prompt, win_lose, bet):
     print()
     display_player_cards(clients['player'][1])
     display_player_cards(clients['dealer'])
     display_player_cards(clients['player'][0])
+
+    dealer_value = clients['dealer'].get_hand_value()
+    p2_value = clients['player'][1].get_hand_value()
+    p1_value = clients['player'][0].get_hand_value()
+
     print('\n', print_prompt)
-    p1.set_player_wealth(p1.get_player_wealth() + bet)
+    clients['player'][0].set_player_wealth(clients['player'][0].get_player_wealth() + bet)
 
     if p2_value > 21:
         print("clients['player'][1] busts, he lost!")
@@ -235,10 +233,10 @@ def outcome(clients, p2_value, dealer_value, p1_value, print_prompt, win_lose, b
     if p2_value == dealer_value:
         print("P2 pushes to Dealer")
 
-    print('\nYou', win_lose, str(bet), '! You now have $', p1.get_player_wealth(), 'dollars!')
-    if p1.get_player_wealth() <= 0 and len(p1.get_items()) > 0:
+    print('\nYou', win_lose, str(bet), '! You now have $', clients['player'][0].get_player_wealth(), 'dollars!')
+    if clients['player'][0].get_player_wealth() <= 0 and len(clients['player'][0].get_items()) > 0:
         print(f'You are out of money. You need to sell something in order to continue playing! \n ')
-        p1.sell_item()
+        clients['player'][0].sell_item()
         # item = input("Which item would you like to sell?")
         # p1.print_item(item)
 
