@@ -28,6 +28,7 @@ def main():
     global p1
     global p2
     global dealer
+    # temp fix, refactor to not use global
     p1 = Player([], 0, None, 1000, starting_items)
     p2 = Dealer([], 0, "CPU1")
     dealer = Dealer([], 0, "Dealer")
@@ -52,7 +53,7 @@ def main_game_init(decklist, clients, min_bet):
 
     # Starting introduction
     print("Welcome to BlackJack!")
-    time.sleep(0.8)
+    time.sleep(0.5)
 
     running = True
     while running:
@@ -79,7 +80,7 @@ def main_game_init(decklist, clients, min_bet):
 
 
             main_game_logic(clients, decklist, bet)
-            time.sleep(2)
+            time.sleep(1)
             for p in clients['player']:
                 p.set_hand([])
             clients['dealer'].set_hand([])
@@ -94,7 +95,7 @@ def main_game_init(decklist, clients, min_bet):
             # Shows the current balance and deals a new hand
             print("Current Balance: $" + str(p1.get_player_wealth()))
             print("\nDealing new hand....")
-            time.sleep(2)
+            time.sleep(1)
 
             for x in range(2):
                 for player in clients['player']:
@@ -110,36 +111,36 @@ def main_game_logic(clients, decklist, bet):
         # os.system('cls' if os.name == 'nt' else 'clear')
 
         # Count's the hand value
-        clients['player'][0].set_hand_value(p1.count_hand())
-        clients['player'][1].set_hand_value(p2.count_hand())
+        clients['player'][0].set_hand_value(clients['player'][0].count_hand())
+        clients['player'][1].set_hand_value(clients['player'][1].count_hand())
         clients['dealer'].set_hand_value(dealer.count_hand())
 
         # If statements for game logic.
-        if dealer.get_hand_value() != 21:
-            while p2.get_hand_value() < 17:
-                p2.draw(decklist.draw_card())
-                p2.set_hand_value(p2.count_hand())
-            display_player_cards(p2.get_hand(), p2.get_hand_value(), "P2")
+        if clients['dealer'].get_hand_value() != 21:
+            while clients['player'][1].get_hand_value() < 17:
+                clients['player'][1].draw(decklist.draw_card())
+                clients['player'][1].set_hand_value(clients['player'][1].count_hand())
+            display_player_cards(clients['player'][1].get_hand(), clients['player'][1].get_hand_value(), "P2")
 
             # If dealer doesn't have Blackjack, move forward and display the hands
-            if p1.get_hand_value() != 21 or p1.get_hand_value() == 21 and len(p1.get_hand()) > 2:
+            if clients['player'][0].get_hand_value() != 21 or clients['player'][0].get_hand_value() == 21 and len(clients['player'][0].get_hand()) > 2:
                 print('Dealer Hand:')
                 print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 print(f'[]\n')
-                display_player_cards(p1.get_hand(), p1.get_hand_value())
+                display_player_cards(clients['player'][0].get_hand(), clients['player'][0].get_hand_value())
                 user_choice = choice()
 
                 # User input for stand or hit, if hit move forward
                 if user_choice.upper() == 'H':
 
                     # Draw card and recount the hand and set it to the value.
-                    p1.draw(decklist.draw_card())
-                    p1.set_hand_value(p1.count_hand())
+                    clients['player'][0].draw(decklist.draw_card())
+                    clients['player'][0].set_hand_value(clients['player'][0].count_hand())
 
                     # Game logic, if hand value is over 21 you lose automatically.
-                    if p1.get_hand_value() > 21:
+                    if clients['player'][0].get_hand_value() > 21:
                         # os.system('cls' if os.name == 'nt' else 'clear')
-                        outcome(dealer, p1, p2, p2.get_hand_value(),  dealer.get_hand_value(), p1.get_hand_value(),
+                        outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(),  dealer.get_hand_value(), clients['player'][0].get_hand_value(),
                                 '\nYou busted, you lose!', 'lost', -bet)
                         loop_boolean = True
 
@@ -156,13 +157,13 @@ def main_game_logic(clients, decklist, bet):
 
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
-                outcome(dealer, p1, p2, p2.get_hand_value(),  dealer.get_hand_value(), p1.get_hand_value(),
+                outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(),  dealer.get_hand_value(), clients['player'][0].get_hand_value(),
                         'You have Black jack, you win!',
                         'win ', bet)
                 loop_boolean = True
         else:
             # Game logic, the dealer has black jack, you automatically lose no matter what.
-            outcome(dealer, p1, p2, p2.get_hand_value(), dealer.get_hand_value(), p1.get_hand_value(),
+            outcome(dealer, clients['player'][0], clients['player'][1], clients['player'][1].get_hand_value(), dealer.get_hand_value(), clients['player'][0].get_hand_value(),
                     'The dealer has Black jack, you lose!', 'lost', -bet)
             loop_boolean = True
 
@@ -243,8 +244,8 @@ def outcome(dealer, p1, p2, p2_value, dealer_value, p1_value, print_prompt, win_
     print('\nYou', win_lose, str(bet), '! You now have $', p1.get_player_wealth(), 'dollars!')
     if p1.get_player_wealth() <= 0 and len(p1.get_items()) > 0:
         print(f'You are out of money. You need to sell something in order to continue playing! \n ')
-        print(f'You have these items available to sell:\n {p1.get_items()}')
-        item = input("Which item would you like to sell?")
+        p1.sell_item()
+        # item = input("Which item would you like to sell?")
         p1.print_item(item)
 
 
