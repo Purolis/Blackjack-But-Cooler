@@ -102,33 +102,34 @@ class Player(Dealer):
             print(Colors.red+"You don't have enough money to make the minimum bet!"+Colors.reset)
             print("You must sell an item to continue playing.")
             return -1 # user is poor, sell items then retry
-        
-        valid = False
-        while not valid:
-            print("\nYou have $"+str(self.get_player_wealth()))
-            print("Minimum bet: $"+str(minimum))
-            try:
-                choice = int(input("How much would you like to bet? : $"))
-            except (TypeError, ValueError):
-                print("Please enter an integer dollar ammount.")
-            except KeyboardInterrupt:
-                print("\nquitting...")
-                exit()
-            except BaseException as e:
-                print("Not sure what you did, but you broke it!")
-            else:
-                if choice > self.get_player_wealth():
-                    print("That's more money than you have!")
-                elif choice < 0:
-                    print("Bet amount must be positive.")
-                elif choice < minimum:
-                    print("You must at least bet the minimum bet. ($"+str(minimum)+")")
+        else:
+            valid = False
+            while not valid:
+                print("\nYou have $"+str(self.get_player_wealth()))
+                print("Minimum bet: $"+str(minimum))
+                try:
+                    choice = int(input("How much would you like to bet? : $"))
+                except (TypeError, ValueError):
+                    print("Please enter an integer dollar ammount.")
+                except KeyboardInterrupt:
+                    print("\nquitting...")
+                    exit()
+                except BaseException as e:
+                    print("Not sure what you did, but you broke it!")
                 else:
-                    valid = True
-        
-        print("You bet $"+str(choice))
-        self.set_player_wealth(self.get_player_wealth()-choice)
-        print("You now have $"+str(self.get_player_wealth())+" in your account.")
+                    if choice > self.get_player_wealth():
+                        print("That's more money than you have!")
+                    elif choice < 0:
+                        print("Bet amount must be positive.")
+                    elif choice < minimum:
+                        print("You must at least bet the minimum bet. ($"+str(minimum)+")")
+                    else:
+                        valid = True
+            
+            print("You bet $"+str(choice))
+            self.set_player_wealth(self.get_player_wealth()-choice)
+            print("You now have $"+str(self.get_player_wealth())+" in your account.")
+            return 0 # betting worked properly, contunue with next hand
 
 
         
