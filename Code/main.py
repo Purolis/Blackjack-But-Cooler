@@ -249,7 +249,7 @@ def outcome(dealer, p1, p2, p2_value, dealer_value, p1_value, print_prompt, win_
         print(f'You are out of money. You need to sell something in order to continue playing! \n ')
         p1.sell_item()
         # item = input("Which item would you like to sell?")
-        p1.print_item(item)
+        # p1.print_item(item)
 
 
 # Function that allows the user to bet and returns that bet
