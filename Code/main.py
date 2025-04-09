@@ -11,12 +11,17 @@ def main():
     decklist.create_deck()
     decklist.shuffle_deck()
 
+    minimum_bet = 200
+
     starting_items = {
-        "house": 170_000,
+        "house": 50_000,
+        "firstborn": 30_000,
         "car": 25_000,
+        "dog": 666,
+        "watch": 500,
         "shoes": 90,
-        "the shirt off your back": 10,
-        "dog": 300,
+        "pants": 50,
+        "shirt": 15,
     }
     # Creates player and dealer and sets base wealth to 1000
     p1 = Player([], 0, None, 1000, starting_items)
@@ -30,19 +35,36 @@ def main():
             player.draw(decklist.draw_card())
 
     # Initializaes the actual game
-    main_game_init(p1, p2, dealer, decklist, players)
+    main_game_init(p1, p2, dealer, decklist, players, minimum_bet)
 
 
-def main_game_init(p1, p2, dealer, decklist, players):
+def main_game_init(p1, p2, dealer, decklist, players, min_bet):
 
     # Starting introduction
     print("Welcome to BlackJack!")
-    print("Current Starting Balance: $" + str(p1.get_player_wealth()))
-    time.sleep(1)
+            # print("Current Starting Balance: $" + str(p1.get_player_wealth()))
+    time.sleep(0.8)
 
     # While player wealth is not 0 play the game
-    while p1.get_player_wealth() > 0:
-        bet = user_bet(p1)
+    # while p1.get_player_wealth() > min_bet:
+    bet_made = False
+    while not bet_made:
+        bet = p1.bet(min_bet)
+        if bet == -1: 
+            # if a bet cannot be made, sell an item
+            did_sell = p1.sell_item()
+            if did_sell == -1: 
+                # no items to sell, game over
+                print("\n\n\tYou Lose!\n\tGame Over\n\tThank you for playing!\n")
+                exit()
+        else:
+            bet_made = True
+
+        # first bet
+
+
+
+        # bet = user_bet(p1)
         main_game_logic(p1, p2, dealer, decklist, bet)
         time.sleep(5)
         p1.set_hand([])
