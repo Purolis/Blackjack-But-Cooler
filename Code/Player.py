@@ -5,6 +5,7 @@ class Player(Dealer):
 
     # Default Variables
     __player_wealth = 0
+    __player_bet = 0
     __items = {}
 
     # Initialization
@@ -42,20 +43,20 @@ class Player(Dealer):
                 try:
                     choice = str(input(": ")).lower()
                 except TypeError:
-                    print("Invalid selection (not a string), please choose an item on the list above.")
+                    print(Colors.red+"Invalid selection (not a string), please choose an item on the list above."+Colors.reset)
                     continue
                 except KeyboardInterrupt:
-                    print("\nquitting...")
+                    print(Colors.red+"\nquitting..."+Colors.reset)
                     exit()
                 except BaseException:
-                    print("I'm not sure what you did, but you broke it, congrats.")
-                    print("Invalid selection, please choose an item on the list above.")
+                    print(Colors.red+"I'm not sure what you did, but you broke it, congrats."+Colors.reset)
+                    print(Colors.red+"Invalid selection, please choose an item on the list above."+Colors.reset)
                     continue
                 else:
                     if choice in self.get_items():
                         valid = True
                     else:
-                        print("Invalid selection, please choose an item on the list above.")
+                        print(Colors.red+"Invalid selection, please choose an item on the list above."+Colors.reset)
 
             if choice == "dog": # shame the user for selling the dog
                 print(Colors.red+"""
@@ -78,7 +79,7 @@ class Player(Dealer):
 ░  ░      ░  ░ ▒ ▒░ ░ ░░   ░ ▒░░ ░▒  ░ ░    ░     ░ ░  ░  ░▒ ░ ▒░
 ░      ░   ░ ░ ░ ▒     ░   ░ ░ ░  ░  ░    ░         ░     ░░   ░ 
        ░       ░ ░           ░       ░              ░  ░   ░                                         
-                """+Colors.reset)
+You sold your dog, I hope you're happy, malignant oaf."""+Colors.reset)
 
             # update player wealth and items
             new_items = self.get_items()
@@ -96,7 +97,7 @@ class Player(Dealer):
         # minimum bet: $100
         # make sure user can't bet more than they have, or negative values
         # if user is out of money, call sell_item(); maybe put that into main with a check
-        print("DEBUG:: bet()")
+        # print("DEBUG@Player.py@bet()")
 
         if self.get_player_wealth() < minimum:
             print(Colors.red+"You don't have enough money to make the minimum bet!"+Colors.reset)
@@ -119,7 +120,7 @@ class Player(Dealer):
                 else:
                     if choice > self.get_player_wealth():
                         print(Colors.red+"That's more money than you have!"+Colors.reset)
-                    elif choice < 0:
+                    elif choice <= 0:
                         print(Colors.red+"Bet amount must be positive."+Colors.reset)
                     elif choice < minimum:
                         print(Colors.red+"You must at least bet the minimum bet. ($"+str(minimum)+")"+Colors.reset)
@@ -138,6 +139,8 @@ class Player(Dealer):
         print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
         self.set_player_wealth(self.__items.pop(item))
 
+    
+
     # Getters
     def get_player_wealth(self):
         return self.__player_wealth
@@ -151,6 +154,9 @@ class Player(Dealer):
     def get_all_items(self):
         return len(self.__items)
 
+    def get_player_bet(self):
+        return self.__player_bet
+
     # Setters
     def set_player_wealth(self, player_wealth):
         self.__player_wealth = player_wealth
@@ -158,17 +164,19 @@ class Player(Dealer):
     def set_items(self, items):
         self.__items = items
 
+    def set_player_bet(self, bet):
+        self.__player_bet = bet
+
     # to_string
     def __str__(self):
         txt = ""
         txt += super().__str__()
-        txt = txt[:-31] # get rid of end-cap to append information
+        txt = txt[:-29] # get rid of end-cap to append information
         txt += "\n"
         if self.get_name() is None:
             txt += "├─ Your Wealth: $" + str(self.get_player_wealth()) + "\n"
         else:
             txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
-        txt += "└───────────────────────\033[0m\n"
-            # \033[0m 🡺 reset text color
+        txt += "╘═══════════════════════"+Colors.reset
 
         return txt
