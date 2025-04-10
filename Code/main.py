@@ -8,6 +8,7 @@
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
+from Colors import Colors
 from enum import Enum
 import os
 import time
@@ -35,16 +36,16 @@ def main():
 
 # --- INITIALIZATION ---
     minimum_bet = 100
-    starting_balance = 50 # it is low like this to show functionality. Increase before releasing
+    starting_balance = 100 # it is low like this to show functionality. Increase before releasing
     starting_items = {
-        "house": 50_000,
-        "firstborn": 30_000,
-        "car": 25_000,
+        # "house": 50_000,
+        # "firstborn": 30_000,
+        # "car": 25_000,
         "dog": 666,
-        "watch": 500,
-        "shoes": 90,
-        "pants": 50,
-        "shirt": 15,
+        # "watch": 500,
+        # "shoes": 90,
+        # "pants": 50,
+        # "shirt": 15,
     }
 
     # Create players and dealer and sets base wealth to 1000   
@@ -123,7 +124,8 @@ def game_loop(clients, min_bet):
             sale_outcome = clients.PLAYER.value.sell_item()
             if sale_outcome == -1:
                 # no items to sell, game over
-                print("HAHAHAHA YOU'RE BROKE GETOUTTAHERE (you lost!)")
+                print("You don't have enough money to continue, and have no items to sell!")
+                print("Game Over!")
                 exit()
             else:
                 continue
@@ -133,6 +135,8 @@ def game_loop(clients, min_bet):
     # Creates a deck and shuffles the deck
     decklist = Deck([])
     decklist.create_deck()
+    decklist.shuffle_deck()
+    decklist.shuffle_deck()
     decklist.shuffle_deck()
 
     # ensure hands are empty, then draw 2 cards to start
@@ -144,7 +148,6 @@ def game_loop(clients, min_bet):
             c.draw(decklist.draw_card())
 
     check_hands(clients)
-    print()
     display_all_hands(clients)
 
     # determine if end_round conditions are already met (turn-one blackjack)
@@ -168,9 +171,22 @@ def game_loop(clients, min_bet):
     if len(nat_winners) == 1 and not dealer_nat_black:
         bet_resolution(clients)
 
-    # no nat blackjacks to end game with: continue to 'Hit, Stand, or Bust'
-        # TODO 'Hit, Stand, or Bust' (it should probably go in its own function?)
-    pass
+    # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
+    c_flag = clients.PLAYER.value.get_flags()
+    while not c_flag["bust"] and not c_flag["finished_turn"]:
+        c_decision = hit_stand(clients.PLAYER)
+        if c_decision == 'hit':
+            clients.PLAYER.value.draw(decklist.draw_card())
+            check_hands(clients)
+            print(clients.PLAYER.value)
+        else:
+            clients.PLAYER.value.set_flag('finished_turn', True)
+        # update flags for next iteration
+        check_hands(clients)
+        c_flag = clients.PLAYER.value.get_flags()
+
+    display_all_hands(clients)
+    exit()
 
 
 
@@ -180,7 +196,36 @@ def game_loop(clients, min_bet):
 
 
 
+def hit_stand(c):
+    valid_choice = False
+    while not valid_choice:
+        try:
+            choice = str(input( (str(c.name)+" > Hit or stand? :") ))
+            if choice.lower() in ('h','hit'):
+                print(str(c.name) + " hits...")
+                choice = 'hit'
+                valid_choice = True
+            elif choice.lower() in ('s', 'stand'):
+                print(str(c.name) + " stands...")
+                choice = 'stand'
+                valid_choice = True
+            else:
+                print(Colors.red+"Please enter a valid input ('h','hit','s','stand')"+Colors.reset)
+        except KeyboardInterrupt:
+            print(Colors.red+"quitting..."+Colors.reset)
+            exit()
+        except BaseException as e:
+            print(e) #DEBUG
+            print(Colors.red+"Ya broke it! Try again."+Colors.reset)
 
+    if choice == 'hit':
+        return "hit"
+    else:            
+        return "stand"
+
+
+
+    # user choice to hit or stand
 
 def bet_resolution(clients):
     # method for resolving bets after a round has ended
@@ -198,10 +243,11 @@ def check_for_win(clients):
         if c.name == "DEALER" and c.value.get_flags()["bust"]:
             print("*"*20,"DEALER BUST","*"*20)
 
-def display_all_hands(clients, show_hole=False):
+def display_all_hands(clients, hide_hole=True):
+    print()
     for c in (clients):
         if c.name == "DEALER":
-            c.value.set_flag("hide_hole", True)
+            c.value.set_flag("hide_hole", hide_hole)
         print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
         print(c.value)
 
@@ -223,13 +269,6 @@ def check_hands(clients):
             c.set_flag("natural_blackjack", True)
         elif val == 21: 
             c.set_flag("blackjack", True)
-
-    # DEBUG:: I'm not sure if this will work upon return to the main logic loop
-    # for c in clients: #DEBUG
-        # c = c.value
-        # print("\tDEBUG@check_hands(): printing")
-        # print(c.value) #DEBUG
-        # print(c.name,str(c.value.get_flags())) #DEBUG
 
 
 if __name__ == '__main__':
