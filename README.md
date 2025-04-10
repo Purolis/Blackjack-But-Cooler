@@ -16,6 +16,10 @@ Possible Ideas:
 Note: It will also work in PyCharm, but won't look as pretty.
 
 ## Code
+- [Button](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Button.py)
+- [GUI](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/guiMain.py)
+- [Test](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/test.py)
+- [Colors](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Colors.py)
 - [Card Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Card.py)
 - [Dealer Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Dealer.py)
 - [Deck Class](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Deck.py)
@@ -37,7 +41,12 @@ Note: It will also work in PyCharm, but won't look as pretty.
 - [Story Three](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Three.jpg)
 - [Story Four](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Four.jpg)
 - [Story Five](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Five.jpg)
+- [Story Six](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Six.jpg)
+- [Story Seven](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20Seven.jpg)
+- [Story Eight](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Stories/Story%20SEight.jpg)
 - [UML Diagram](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/Blackjack%20UML.jpg)
+- [UML GUI Diagram](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/UML_UI_diagram.png)
+- [Problem Frame](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Documentation/Diagrams/Problem%20Frame.jpg)
 
 
 
