@@ -113,7 +113,14 @@ def ace_reduction():
 		Card(10, 'Hearts', 'Queen of Hearts'),
 	])
 
+	d1.set_hand([
+		Card(11, 'Diamonds', 'Ace of Diamonds'), 
+		Card(11, 'Clubs', 'Ace of Clubs'), 
+		Card(11, 'Spades', 'Ace of Spades'), 
+	])
+	
 	print(user)
+	print(d1)
 
 
 def bet_test():
