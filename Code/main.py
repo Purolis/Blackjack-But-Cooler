@@ -46,6 +46,7 @@ def main():
         # "shoes": 90,
         # "pants": 50,
         # "shirt": 15,
+        "quit": "exit game"
     }
 
     # Create players and dealer and sets base wealth to 1000   
@@ -113,6 +114,11 @@ def game_loop(clients, min_bet):
                     running = False
                     did_bet = True
                     return
+                elif sale_outcome == -2:
+                    running = False
+                    did_bet = True
+                    return
+                    
 
 
         # add CPU bets

@@ -33,7 +33,10 @@ class Player(Dealer):
             print("Choose which item to sell 🡻 (type the full word of the item)")
             item_list = ""
             for i in self.get_items():
-                item_list += "├─ " + str(i.title()) + " : $" + str(self.get_value(i)) + "\n"
+                if i == "quit":
+                    item_list += "├─ " + str(i.title()) + " : " + str(self.get_value(i)) + "\n"
+                else:
+                    item_list += "├─ " + str(i.title()) + " : $" + str(self.get_value(i)) + "\n"
             print(item_list)
 
             # input validation for player selection
@@ -81,6 +84,9 @@ class Player(Dealer):
        ░       ░ ░           ░       ░              ░  ░   ░                                         
 You sold your dog, I hope you're happy, malignant oaf."""+Colors.reset)
 
+            if choice == "quit":
+                print("You leave the table with your dignity.")
+                return -2 # player quit
             # update player wealth and items
             new_items = self.get_items()
             gained_wealth = new_items[choice]
@@ -135,9 +141,9 @@ You sold your dog, I hope you're happy, malignant oaf."""+Colors.reset)
 
         
 
-    def print_item(self, item):
-        print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
-        self.set_player_wealth(self.__items.pop(item))
+    # def print_item(self, item):
+    #     print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
+    #     self.set_player_wealth(self.__items.pop(item))
 
     
 
