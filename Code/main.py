@@ -8,8 +8,10 @@
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
+from Card import Card
 from Colors import Colors
 from enum import Enum
+import re
 import os
 import time
 
@@ -118,7 +120,7 @@ def game_loop(clients, min_bet):
                     running = False
                     did_bet = True
                     return
-                    
+
 
 
         # add CPU bets
@@ -168,8 +170,8 @@ def game_loop(clients, min_bet):
                 clients.name.set_flag("push", True)
 
         # player wins with nat blackjack
-        if len(nat_winners) == 1 and not dealer_nat_black:
-            bet_resolution(clients)
+        # if len(nat_winners) == 1 and not dealer_nat_black:
+            # bet_resolution(clients)
 
         # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
         c_flag = clients.PLAYER.value.get_flags()
@@ -191,9 +193,10 @@ def game_loop(clients, min_bet):
         # end-of-round display, dealer flips hole card
         check_hands(clients)
         display_all_hands(clients, hide_hole=False)
-        # victory_check(clients)
+        victory_check(clients)
 
 def victory_check(clients):
+    print("DEBUG@victory_check()") #DEBUG
 #Winning the Game
     # Blackjack: 
         # If your first two cards are an Ace and a 10-value card (10, Jack, Queen, King), 
@@ -209,18 +212,21 @@ def victory_check(clients):
     # Lower Value than Dealer: 
         # If the dealer’s hand total is closer to 21 than yours without busting, you lose your bet.
 
+    check_hands(clients)
     outcome_txt = ""
-
     dealer_flags = clients.DEALER.value.get_flags()
+
     if dealer_flags['bust']:
-        outcome_txt += "Dealer bust! Players reign supreme!"
+        outcome_txt += "Dealer bust! Players reign supreme! (Everyone wins!)"
         for c in clients:
-            if c.name in ('player', 'cpu'):
-                print("DEBUG@victory_check(): "+c.name+" check")
+            if re.search("^player|^cpu", c.name.lower()): # RegEx for name search
+                # print("DEBUG@victory_check(): "+c.name+" check") #DEBUG
                 if not c.value.get_flags()['bust']:
                     wealth = c.value.get_player_wealth()
                     bet = c.value.get_player_bet()
                     c.value.set_player_wealth(wealth + (bet*2))
+                    print(c.name+" gained $" + str(bet*2))
+    print(outcome_txt)
 
 
     # Lose – the player’s bet is taken by the dealer.
@@ -329,5 +335,84 @@ def check_hands(clients):
             c.set_flag("blackjack", True)
 
 
+
+def test():
+# Creates a deck and shuffles the deck
+    decklist = Deck([])
+    decklist.create_deck()
+    decklist.shuffle_deck()
+    decklist.shuffle_deck()
+    decklist.shuffle_deck()
+
+    minimum_bet = 100
+    starting_balance = 100 # it is low like this to show functionality. Increase before releasing
+    starting_items = {
+        # "house": 50_000,
+        # "firstborn": 30_000,
+        # "car": 25_000,
+        "dog": 666,
+        # "watch": 500,
+        # "shoes": 90,
+        # "pants": 50,
+        # "shirt": 15,
+        "quit": "exit game"
+    }
+
+    # Create players and dealer and sets base wealth to 1000   
+    class Clients(Enum): # https://www.geeksforgeeks.org/enum-in-python/
+        PLAYER = Player([], 0, None, starting_balance, starting_items)
+        CPU1 = Player([], 0, "CPU1", starting_balance, {})
+        CPU2 = Player([], 0, "CPU2", starting_balance, {})
+        DEALER = Dealer([Card], 0, "DEALER")
+
+    Clients.DEALER.value.set_hand([
+        Card(10, 'Diamonds', 'Queen of Diamonds'), 
+        Card(10, 'Diamonds', 'King of Diamonds'), 
+        Card(10, 'Hearts', 'Queen of Hearts'),
+    ])
+
+    did_bet = False
+
+    print("\n\n-+-+- New round start! -+-+-\n\n")
+
+    # user place bet (and sell if can't meet minimum [and lose if broke])
+    while not did_bet:
+        bet_outcome = Clients.PLAYER.value.bet(100)
+        if bet_outcome > 0:
+            Clients.PLAYER.value.set_player_bet(bet_outcome)
+            did_bet = True
+        else:
+            sale_outcome = Clients.PLAYER.value.sell_item()
+            if sale_outcome == -1:
+                # no items to sell, game over
+                print("You don't have enough money to continue, and have no items to sell!")
+                print("Game Over!")
+                running = False
+                did_bet = True
+                return
+            elif sale_outcome == -2:
+                running = False
+                did_bet = True
+                return
+
+    # add CPU bets
+    for c in Clients:
+        if 'cpu' in c.name.lower():
+            c.value.set_player_bet(100)
+            c.value.set_player_wealth( c.value.get_player_wealth() - c.value.get_player_bet() )
+
+    check_hands(Clients)
+
+    cpu_resolve(Clients, decklist)
+
+    check_hands(Clients)
+
+    display_all_hands(Clients)
+    victory_check(Clients)
+    display_all_hands(Clients, hide_hole=False)
+
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    test()
