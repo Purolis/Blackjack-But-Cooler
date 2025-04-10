@@ -51,14 +51,12 @@ def main():
     # Create players and dealer and sets base wealth to 1000   
     class Clients(Enum): # https://www.geeksforgeeks.org/enum-in-python/
         PLAYER = Player([], 0, None, starting_balance, starting_items)
-        CPU1 = Dealer([], 0, "CPU1")
-        CPU2 = Dealer([], 0, "CPU2")
+        CPU1 = Player([], 0, "CPU1", starting_balance, {})
+        CPU2 = Player([], 0, "CPU2", starting_balance, {})
         DEALER = Dealer([], 0, "DEALER")
 
     game_loop(Clients, minimum_bet)
     print("""
-
-
   _   _                 _             
  | | | |               | |            
  | |_| |__   __ _ _ __ | | _____      
@@ -77,60 +75,14 @@ def main():
  | .__/|_|\\__,_|\\__, |_|_| |_|\\__, (_)
  | |             __/ |         __/ |  
  |_|            |___/         |___/   
-
-
-        """)
+ """)
     exit()
 
-    ########################################################################################################################################################################
-    #######################################################               NOTES               ##############################################################################
-    ########################################################################################################################################################################
-    # politely ignore this part.
-    # I am, in fact, a little bit insane
-
-    # print("\t\t\tDEBUG@main(): flags")
-    # for c in (Clients):
-    #     c = c.value
-    #     print(str(c.get_flags()))
-
-    # for c in (Clients):
-    #     c = c.value
-    #     print(c)
-
-    # Lose – the player’s bet is taken by the dealer.
-    # Win – the player wins as much as they bet. If you bet $10, you win $10 from the dealer (plus you keep your original bet, of course.)
-    # Blackjack (natural) – the player wins 1.5 times the bet. With a bet of $10, you keep your $10 and win a further $15 from the dealer.
-    # Push – the hand is a draw. The player keeps their bet, neither winning nor losing money.
-
-    # When all players have finished their actions, the dealer turns over their hidden hole card
-    # The dealer must hit if the value of the hand is lower than 17, 
-        # otherwise the dealer will stand.
-
-#Winning the Game
-    # Blackjack: 
-        # If your first two cards are an Ace and a 10-value card (10, Jack, Queen, King), this is an automatic win (Blackjack) and pays out at a higher rate than a regular win (usually ×1.5).
-    # Higher Value than Dealer: 
-        # If your hand total is closer to 21 than the dealer’s hand total without going bust, you win. Winnings are typically paid out at 1:1.
-    # Dealer Busts: 
-        # If the dealer’s hand total goes over 21 (busts), you win regardless of your hand value.
-    # Push: 
-        # If your hand total equals the dealer’s hand total, it’s a tie (push) and your bet is returned without any winnings or losses.
-    # Lower Value than Dealer: 
-        # If the dealer’s hand total is closer to 21 than yours without busting, you lose your bet.
-    ########################################################################################################################################################################
 
 
 
 
-
-
-
-
-
-
-
-
-
+######################## GAME LOGIC ########################
 
 def game_loop(clients, min_bet):
     # misc variables
@@ -162,7 +114,17 @@ def game_loop(clients, min_bet):
                     did_bet = True
                     return
 
-        print("DEBUG@game_loop: player bet:",clients.PLAYER.value.get_player_bet()) #DEBUG
+
+        # add CPU bets
+        for c in clients:
+            if 'cpu' in c.name.lower():
+                c.value.set_player_bet(min_bet)
+                c.value.set_player_wealth( c.value.get_player_wealth() - c.value.get_player_bet() )
+
+        # print("DEBUG@game_loop: player bet:",clients.PLAYER.value.get_player_bet()) #DEBUG
+        for c in clients:
+            if c.name.lower() not in ('dealer'):
+                print("DEBUG@game_loop: "+c.name+" bet:",c.value.get_player_bet()) #DEBUG
 
         # Creates a deck and shuffles the deck
         decklist = Deck([])
@@ -223,6 +185,43 @@ def game_loop(clients, min_bet):
         # end-of-round display, dealer flips hole card
         check_hands(clients)
         display_all_hands(clients, hide_hole=False)
+        # victory_check(clients)
+
+def victory_check(clients):
+#Winning the Game
+    # Blackjack: 
+        # If your first two cards are an Ace and a 10-value card (10, Jack, Queen, King), 
+        # this is an automatic win (Blackjack) and pays out at a higher rate than a regular win (usually ×1.5).
+    # Higher Value than Dealer: 
+        # If your hand total is closer to 21 than the dealer’s hand total without going bust, you win. 
+        # Winnings are typically paid out at 1:1.
+    # Dealer Busts: 
+        # If the dealer’s hand total goes over 21 (busts), you win regardless of your hand value.
+    # Push: 
+        # If your hand total equals the dealer’s hand total, 
+        # it’s a tie (push) and your bet is returned without any winnings or losses.
+    # Lower Value than Dealer: 
+        # If the dealer’s hand total is closer to 21 than yours without busting, you lose your bet.
+
+    outcome_txt = ""
+
+    dealer_flags = clients.DEALER.value.get_flags()
+    if dealer_flags['bust']:
+        outcome_txt += "Dealer bust! Players reign supreme!"
+        for c in clients:
+            if c.name in ('player', 'cpu'):
+                print("DEBUG@victory_check(): "+c.name+" check")
+                if not c.value.get_flags()['bust']:
+                    wealth = c.value.get_player_wealth()
+                    bet = c.value.get_player_bet()
+                    c.value.set_player_wealth(wealth + (bet*2))
+
+
+    # Lose – the player’s bet is taken by the dealer.
+    # Win – the player wins as much as they bet. If you bet $10, you win $10 from the dealer (plus you keep your original bet, of course.)
+    # Blackjack (natural) – the player wins 1.5 times the bet. With a bet of $10, you keep your $10 and win a further $15 from the dealer.
+    # Push – the hand is a draw. The player keeps their bet, neither winning nor losing money.
+
 
 
 

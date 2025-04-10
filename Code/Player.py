@@ -175,8 +175,10 @@ You sold your dog, I hope you're happy, malignant oaf."""+Colors.reset)
         txt += "\n"
         if self.get_name() is None:
             txt += "├─ Your Wealth: $" + str(self.get_player_wealth()) + "\n"
+            txt += "├─ Your Bet: $" + str(self.get_player_bet()) + "\n"
         else:
             txt += "├─ " + str(super().get_name()) + " wealth: $" + str(self.get_player_wealth()) + "\n"
+            txt += "├─ " + str(super().get_name()) + " bet: $" + str(self.get_player_bet()) + "\n"
         txt += "╘═══════════════════════"+Colors.reset
 
         return txt
