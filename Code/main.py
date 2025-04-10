@@ -52,9 +52,35 @@ def main():
     class Clients(Enum): # https://www.geeksforgeeks.org/enum-in-python/
         PLAYER = Player([], 0, None, starting_balance, starting_items)
         CPU1 = Dealer([], 0, "CPU1")
+        CPU2 = Dealer([], 0, "CPU2")
         DEALER = Dealer([], 0, "DEALER")
 
     game_loop(Clients, minimum_bet)
+    print("""
+
+
+  _   _                 _             
+ | | | |               | |            
+ | |_| |__   __ _ _ __ | | _____      
+ | __| '_ \\ / _` | '_ \\| |/ / __|     
+ | |_| | | | (_| | | | |   <\\__ \\     
+  \\__|_| |_|\\__,_|_| |_|_|\\_\\___/     
+  / _|                                
+ | |_ ___  _ __                       
+ |  _/ _ \\| '__|                      
+ | || (_) | |                         
+ |_| \\___/|_|         _             _ 
+       | |           (_)           | |
+  _ __ | | __ _ _   _ _ _ __   __ _| |
+ | '_ \\| |/ _` | | | | | '_ \\ / _` | |
+ | |_) | | (_| | |_| | | | | | (_| |_|
+ | .__/|_|\\__,_|\\__, |_|_| |_|\\__, (_)
+ | |             __/ |         __/ |  
+ |_|            |___/         |___/   
+
+
+        """)
+    exit()
 
     ########################################################################################################################################################################
     #######################################################               NOTES               ##############################################################################
@@ -108,95 +134,120 @@ def main():
 
 def game_loop(clients, min_bet):
     # misc variables
-    dealer_nat_black = False
-    nat_winners = []
-    successful_bet = False
+    running = True
 
-    print("\n\n-+-+- New round start! -+-+-\n\n")
+    while running:
+        for c in clients:
+            c.value.reset_flags()
 
-    # user place bet (and sell if can't meet minimum [and lose if broke])
-    while not successful_bet:
-        bet_outcome = clients.PLAYER.value.bet(min_bet)
-        if bet_outcome > 0:
-            clients.PLAYER.value.set_player_bet(bet_outcome)
-            successful_bet = True
-        else:
-            sale_outcome = clients.PLAYER.value.sell_item()
-            if sale_outcome == -1:
-                # no items to sell, game over
-                print("You don't have enough money to continue, and have no items to sell!")
-                print("Game Over!")
-                exit()
+        dealer_nat_black = False
+        nat_winners = []
+        did_bet = False
+
+        print("\n\n-+-+- New round start! -+-+-\n\n")
+
+        # user place bet (and sell if can't meet minimum [and lose if broke])
+        while not did_bet:
+            bet_outcome = clients.PLAYER.value.bet(min_bet)
+            if bet_outcome > 0:
+                clients.PLAYER.value.set_player_bet(bet_outcome)
+                did_bet = True
             else:
-                continue
+                sale_outcome = clients.PLAYER.value.sell_item()
+                if sale_outcome == -1:
+                    # no items to sell, game over
+                    print("You don't have enough money to continue, and have no items to sell!")
+                    print("Game Over!")
+                    running = False
+                    did_bet = True
+                    return
 
-    print("DEBUG@game_loop: player bet:",clients.PLAYER.value.get_player_bet()) #DEBUG
+        print("DEBUG@game_loop: player bet:",clients.PLAYER.value.get_player_bet()) #DEBUG
 
-    # Creates a deck and shuffles the deck
-    decklist = Deck([])
-    decklist.create_deck()
-    decklist.shuffle_deck()
-    decklist.shuffle_deck()
-    decklist.shuffle_deck()
+        # Creates a deck and shuffles the deck
+        decklist = Deck([])
+        decklist.create_deck()
+        decklist.shuffle_deck()
+        decklist.shuffle_deck()
+        decklist.shuffle_deck()
 
-    # ensure hands are empty, then draw 2 cards to start
-    for x in range(2):
-        for c in (clients):
-            c = c.value
-            c.set_hand([])
-            c.draw(decklist.draw_card())
-            c.draw(decklist.draw_card())
+        # ensure hands are empty, then draw 2 cards to start
+        for x in range(2):
+            for c in (clients):
+                c = c.value
+                c.set_hand([])
+                c.draw(decklist.draw_card())
+                c.draw(decklist.draw_card())
 
-    check_hands(clients)
-    display_all_hands(clients)
-
-    # determine if end_round conditions are already met (turn-one blackjack)
-    for c in (clients):
-        if c.value.get_flags()["natural_blackjack"]:
-            if c.name == "DEALER":
-                print("DEBUG:: !!!DEALER!!!: NAT BLACKJACK")
-                dealer_nat_black = True
-            else:
-                print("DEBUG: "+str(c.name)+": NAT BLACKJACK")
-                c.value.set_flag("natural_blackjack", True)
-                nat_winners.append(c.name)
-
-    # if a player does have nat blackjack, check the dealer;   if both have nat black, player pushes
-    if nat_winners != [] and dealer_nat_black:
-        print("DEBUG: dealer+player natural_blackjack; push for player")
-        for name in nat_winners:
-            clients.name.set_flag("push", True)
-
-    # player wins with nat blackjack
-    if len(nat_winners) == 1 and not dealer_nat_black:
-        bet_resolution(clients)
-
-    # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
-    c_flag = clients.PLAYER.value.get_flags()
-    while not c_flag["bust"] and not c_flag["finished_turn"]:
-        c_decision = hit_stand(clients.PLAYER)
-        if c_decision == 'hit':
-            clients.PLAYER.value.draw(decklist.draw_card())
-            check_hands(clients)
-            print(clients.PLAYER.value)
-        else:
-            clients.PLAYER.value.set_flag('finished_turn', True)
-        # update flags for next iteration
         check_hands(clients)
+        display_all_hands(clients)
+
+        # determine if end_round conditions are already met (turn-one blackjack)
+        for c in (clients):
+            if c.value.get_flags()["natural_blackjack"]:
+                if c.name == "DEALER":
+                    print("DEBUG:: !!!DEALER!!!: NAT BLACKJACK")
+                    dealer_nat_black = True
+                else:
+                    print("DEBUG: "+str(c.name)+": NAT BLACKJACK")
+                    c.value.set_flag("natural_blackjack", True)
+                    nat_winners.append(c.name)
+
+        # if a player does have nat blackjack, check the dealer;   if both have nat black, player pushes
+        if nat_winners != [] and dealer_nat_black:
+            print("DEBUG: dealer+player natural_blackjack; push for player")
+            for name in nat_winners:
+                clients.name.set_flag("push", True)
+
+        # player wins with nat blackjack
+        if len(nat_winners) == 1 and not dealer_nat_black:
+            bet_resolution(clients)
+
+        # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
         c_flag = clients.PLAYER.value.get_flags()
+        while not c_flag["bust"] and not c_flag["finished_turn"]:
+            c_decision = hit_stand(clients.PLAYER)
+            if c_decision == 'hit':
+                clients.PLAYER.value.draw(decklist.draw_card())
+                check_hands(clients)
+                print(clients.PLAYER.value)
+            else:
+                clients.PLAYER.value.set_flag('finished_turn', True)
+            # update flags for next iteration
+            check_hands(clients)
+            c_flag = clients.PLAYER.value.get_flags()
 
-    display_all_hands(clients)
-    exit()
+        # after player is done, let CPU and Dealer play
+        cpu_resolve(clients, decklist)
+
+        # end-of-round display, dealer flips hole card
+        check_hands(clients)
+        display_all_hands(clients, hide_hole=False)
 
 
 
+def cpu_resolve(clients, decklist):
+    # rules for CPU and Dealer drawing
+        # Dealer Hits: The dealer is required to draw if they have a hand of less than 17. 
+        # Dealer Stands: The dealer is required to stand with 17 and more in their hand. 
+    check_hands(clients)
+    for c in (clients):
+        if "player" not in c.name.lower():
+            print("DEBUG@cpu_resolve(): CPU play!",c.name)
+            while c.value.get_hand_value() < 17:
+                c.value.draw(decklist.draw_card())
+            c.value.set_flag('finished_turn', True)
 
 
+
+def dealer_resolve(d):
+    pass
 
 
 
 
 def hit_stand(c):
+    # gets user decision for hitting or standing
     valid_choice = False
     while not valid_choice:
         try:
@@ -245,11 +296,13 @@ def check_for_win(clients):
 
 def display_all_hands(clients, hide_hole=True):
     print()
+    time.sleep(0.5)
     for c in (clients):
         if c.name == "DEALER":
             c.value.set_flag("hide_hole", hide_hole)
         print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
         print(c.value)
+        time.sleep(0.1)
 
 def check_hands(clients):
     # print("\t\tDEBUG@check_hands(): START CHECK")

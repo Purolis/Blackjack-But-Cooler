@@ -41,10 +41,9 @@ class Deck:
                 new_card = self.__deck.pop()
             except IndexError:
                 # print("DEBUG@Deck.py@draw_card(): deck is empty, re-filling and shuffling...")
-                self.create_deck
-                self.shuffle_deck
+                self.create_deck()
+                self.shuffle_deck()
                 self.set_deck(self.get_deck())
-
             except BaseException as e:
                 print(Colors.red+"Something went wrong while trying to draw a card, sorry!"+Colors.reset)
                 print(e)
