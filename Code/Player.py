@@ -91,7 +91,7 @@ class Player(Dealer):
             print("New wealth total: $" + str(self.get_player_wealth()))
             return 0  # ran without issue
 
-    def bet(self, minimum=100):
+    def bet(self, minimum=100, amount=None):
         # minimum bet: $100
         # make sure user can't bet more than they have, or negative values
         # if user is out of money, call sell_item(); maybe put that into main with a check
@@ -101,7 +101,7 @@ class Player(Dealer):
             print(Colors.red + "You don't have enough money to make the minimum bet!" + Colors.reset)
             print("You must sell an item to continue playing.")
             return -1  # user is poor, sell items then retry
-        else:
+        if amount == None:
             valid = False
             while not valid:
                 print("\nYou have $" + str(self.get_player_wealth()))
@@ -129,7 +129,13 @@ class Player(Dealer):
             print("You bet $" + str(choice))
             print("You now have $" + str(self.get_player_wealth() - choice) + " in your account.")
             return choice  # betting worked properly, return bet amount and continue to next hand
-
+        else:
+            if amount > self.get_player_wealth():
+                return 1
+            if amount < minimum:
+                return 2
+            else:
+                return 0
     def print_item(self, item):
         print(f'You sold your {item}! You got ${self.get_value(item)} for it!')
         self.set_player_wealth(self.__items.pop(item))
