@@ -1,18 +1,36 @@
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
+from Card import Card
+from Colors import Colors
+from enum import Enum
+import re
 import os
 import time
 
-
 def main():
-    # Creates a deck and shuffles the deck
-    decklist = Deck([])
-    decklist.create_deck()
-    decklist.shuffle_deck()
+# greet user
+    print("""\n\n
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████
+██                                                                                                          ██
+██  ▀█████████▄   ▄█          ▄████████  ▄████████    ▄█   ▄█▄      ▄█    ▄████████  ▄████████    ▄█   ▄█▄  ██
+██    ███    ███ ███         ███    ███ ███    ███   ███ ▄███▀     ███   ███    ███ ███    ███   ███ ▄███▀  ██
+██    ███    ███ ███         ███    ███ ███    █▀    ███▐██▀       ███   ███    ███ ███    █▀    ███▐██▀    ██
+██   ▄███▄▄▄██▀  ███         ███    ███ ███         ▄█████▀        ███   ███    ███ ███         ▄█████▀     ██
+██  ▀▀███▀▀▀██▄  ███       ▀███████████ ███        ▀▀█████▄        ███ ▀███████████ ███        ▀▀█████▄     ██
+██    ███    ██▄ ███         ███    ███ ███    █▄    ███▐██▄       ███   ███    ███ ███    █▄    ███▐██▄    ██
+██    ███    ███ ███▌    ▄   ███    ███ ███    ███   ███ ▀███▄     ███   ███    ███ ███    ███   ███ ▀███▄  ██
+██  ▄█████████▀  █████▄▄██   ███    █▀  ████████▀    ███   ▀█▀ █▄ ▄███   ███    █▀  ████████▀    ███   ▀█▀  ██ 
+██               ▀                                   ▀         ▀▀▀▀▀▀                            ▀          ██
+██                                                                                                          ██
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 
+""")
 
-    minimum_bet = 200
-
+# --- INITIALIZATION ---
+    minimum_bet = 100
+    starting_balance = 1000
     starting_items = {
         "house": 50_000,
         "firstborn": 30_000,
@@ -22,254 +40,293 @@ def main():
         "shoes": 90,
         "pants": 50,
         "shirt": 15,
-    }
-    # Creates players and dealer and sets base wealth to 1000
-    p1 = Player([], 0, None, 1000, starting_items)
-    p2 = Dealer([], 0, "CPU1")
-    dealer = Dealer([], 0, "Dealer")
-
-    clients = {
-        "player": [p1, p2],
-        "dealer": dealer,
+        "quit": "leave table and exit game"
     }
 
-    # Draws 2 cards for both the player and the dealer at the start
-    for x in range(2):
-        clients['player'][0].draw(decklist.draw_card())
-        clients['player'][1].draw(decklist.draw_card())
-        clients['dealer'].draw(decklist.draw_card())
+    # Create players and dealer and sets base wealth to 1000   
+    class Clients(Enum): # https://www.geeksforgeeks.org/enum-in-python/
+        PLAYER = Player([], 0, None, starting_balance, starting_items)
+        CPU1 = Player([], 0, "CPU1", starting_balance, {})
+        CPU2 = Player([], 0, "CPU2", starting_balance, {})
+        DEALER = Dealer([], 0, "DEALER")
 
-    # Initializaes the actual game
-    main_game_init(decklist, clients, minimum_bet)
-
-
-def main_game_init(decklist, clients, min_bet):
-    # Starting introduction
-    print("Welcome to BlackJack!")
-    time.sleep(0.5)
-
+    game_loop(Clients, minimum_bet) # run until player exit or loss
+    goodbye()
+    exit()
+    
+def game_loop(clients, min_bet):
     running = True
     while running:
+        print("\n\n-+-+- New round start! -+-+-\n\n")
 
-        # first bet
-        bet_made = False
-        while not bet_made:
-            print("DEBUG:: betting1")
-            bet = clients['player'][0].bet(min_bet)
-            if bet == -1:
-                print("DEBUG:: not enough money, sell")
-                # if a bet cannot be made, sell an item
-                did_sell = clients['player'][0].sell_item()
-                if did_sell == -1:
-                    print("DEBUG:: nothing to sell")
+        # reset statuses
+        for c in clients:
+            c.value.reset_flags()
+            if c.name != 'DEALER':
+                c.value.set_player_bet(0)
+
+        # user place bet (and sell if can't meet minimum [and lose if broke])
+        did_bet = False
+        while not did_bet:
+            bet_outcome = clients.PLAYER.value.bet(min_bet)
+            if bet_outcome > 0:
+                clients.PLAYER.value.set_player_bet(bet_outcome)
+                did_bet = True
+            else:
+                sale_outcome = clients.PLAYER.value.sell_item()
+                if sale_outcome == -1:
                     # no items to sell, game over
-                    print("\n\n\tYou Lose!\n\tGame Over\n\tThank you for playing!\n")
-                    exit()
-                else:
-                    continue
+                    print("You don't have enough money to continue, and have no items to sell!")
+                    print("You Lost!")
+                    print("Game Over!")
+                    running = False
+                    did_bet = True
+                    return
+                elif sale_outcome == -2:
+                    # user chose to not sell; quit
+                    print("Game Over!")
+                    running = False
+                    did_bet = True
+                    return
+
+        # add CPU bets
+        for c in clients:
+            if 'cpu' in c.name.lower():
+                c.value.set_player_bet(min_bet)
+                c.value.set_player_wealth( c.value.get_player_wealth() - c.value.get_player_bet() )
+                # print("DEBUG@game_loop: "+c.name+" bet:",c.value.get_player_bet()) #DEBUG
+
+        # Creates a deck and shuffles the deck
+        decklist = Deck([])
+        decklist.create_deck()
+        decklist.shuffle_deck()
+        decklist.shuffle_deck()
+        decklist.shuffle_deck()
+
+        # ensure hands are empty, then draw 2 cards to start
+        for x in range(2):
+            for c in (clients):
+                c = c.value
+                c.set_hand([])
+                c.draw(decklist.draw_card())
+                c.draw(decklist.draw_card())
+
+        check_hands(clients)
+        display_all_hands(clients)
+
+        # check for natural blackjack (first round win)
+        nat_bj_winners = []
+        for c in (clients):
+            if c.value.get_flags()['natural_blackjack']:
+                nat_bj_winners.append(c)
+        if len(nat_bj_winners) > 0:
+            if len(nat_bj_winners) == 1 and nat_bj_winners[0].name == "DEALER":
+                # handle edge case where dealer has natural blackjack by themself
+                pass
             else:
-                print("DEBUG:: locked in bet")
-                bet_made = True
-
-            main_game_logic(clients, decklist, bet)
-            time.sleep(1)
-            # new game init
-            for p in clients['player']:
-                p.set_hand([])
-            clients['dealer'].set_hand([])
-            # p1.set_hand([])
-            # p2.set_hand([])
-            # dealer.set_hand([])
-
-            # If the deck ever has no cards shuffle it
-            if decklist.get_deck() == {}:
-                decklist.shuffle_deck()
-
-            # Shows the current balance and deals a new hand
-            print("Current Balance: $" + str(clients['player'][0].get_player_wealth()))
-            print("\nDealing new hand....")
-            time.sleep(1)
-
-            for x in range(2):
-                for player in clients['player']:
-                    player.draw(decklist.draw_card())
-                clients['dealer'].draw(decklist.draw_card())
-
-
-def main_game_logic(clients, decklist, bet):
-    loop_boolean = False
-    # While choice is still going
-    while not loop_boolean:
-        # os clears are just to make output look nice in command line,
-        # os.system('cls' if os.name == 'nt' else 'clear')
-
-        # Count's the hand value
-        clients['player'][0].set_hand_value(clients['player'][0].count_hand())
-        clients['player'][1].set_hand_value(clients['player'][1].count_hand())
-        clients['dealer'].set_hand_value(clients['dealer'].count_hand())
-
-        # If statements for game logic.
-        if clients['dealer'].get_hand_value() != 21:
-            while clients['player'][1].get_hand_value() < 17:
-                clients['player'][1].draw(decklist.draw_card())
-                clients['player'][1].set_hand_value(clients['player'][1].count_hand())
-            display_player_cards(clients['player'][1])
-
-            # If dealer doesn't have Blackjack, move forward and display the hands
-            if clients['player'][0].get_hand_value() != 21 or clients['player'][0].get_hand_value() == 21 and len(
-                    clients['player'][0].get_hand()) > 2:
-                print(clients['dealer'])
-                # print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
-                # print(f'[]\n')
-                display_player_cards(clients['player'][0])
-                user_choice = choice()
-
-                # User input for stand or hit, if hit move forward
-                if user_choice.upper() == 'H':
-
-                    # Draw card and recount the hand and set it to the value.
-                    clients['player'][0].draw(decklist.draw_card())
-                    clients['player'][0].set_hand_value(clients['player'][0].count_hand())
-
-                    # Game logic, if hand value is over 21 you lose automatically.
-                    if clients['player'][0].get_hand_value() > 21:
-                        # os.system('cls' if os.name == 'nt' else 'clear')
-                        outcome(clients, '\nYou busted, you lose!', 'lost', -bet)
-                        loop_boolean = True
-
-                else:
-                    # Apart of the game logic it's just split up
-                    loop_boolean = game_logic_split(
-                        clients,
-                        decklist,
-                        bet,
-                        loop_boolean
-                    )
-
-            else:
-                # Game logic, you had 21 at the start from the beginning if statement!
-                outcome(clients, 'You have Black jack, you win!', 'win ', bet)
-                loop_boolean = True
+                # natural blackjack ends round, dealer 
+                # cash out for winners, deal new hand
+                # print("DEBUG@game_loop: nat_bj_winners: "+str(nat_bj_winners)) #DEBUG
+                if clients.DEALER.value.get_flags()['natural_blackjack']:
+                    # if dealer also has nat bj, players push
+                    for c in nat_bj_winners:
+                        c.value.set_flag('push', True)
+                cpu_resolve(clients, decklist)
+                outcome_txt = victory_resolution(clients)
+                print()
+                print(outcome_txt)
         else:
-            # Game logic, the dealer has black jack, you automatically lose no matter what.
-            outcome(clients, 'The dealer has Black jack, you lose!', 'lost', -bet)
-            loop_boolean = True
+            # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
+            c_flag = clients.PLAYER.value.get_flags()
+            while not c_flag["bust"] and not c_flag["finished_turn"]:
+                c_decision = hit_stand(clients.PLAYER)
+                if c_decision == 'hit':
+                    clients.PLAYER.value.draw(decklist.draw_card())
+                    check_hands(clients)
+                    print(clients.PLAYER.value)
+                else:
+                    clients.PLAYER.value.set_flag('finished_turn', True)
+                # update flags for next iteration
+                check_hands(clients)
+                c_flag = clients.PLAYER.value.get_flags()
 
+            # after player is done, let CPU and Dealer play
+            cpu_resolve(clients, decklist)
 
-# Function that neatly displays the cards in [example card] [example card]
-def display_player_cards(player):
-    print(player)
-    # print(f'{player} Hand:')
-    # for card in hand:
-    #     print(f'[{card.get_name()}]', end=' ')
-    # print(f'[Value: {player_value}]')
+            # end-of-round display, dealer flips hole card
+            check_hands(clients)
+            outcome_txt = victory_resolution(clients)
+            display_all_hands(clients, hide_hole=False)
+            print()
+            print(outcome_txt)
 
+def victory_resolution(clients):
+    # print("DEBUG@victory_resolution()") #DEBUG
+    check_hands(clients)
+    outcome_txt = ""
 
-def dealer_17_logic(clients, decklist):
-    # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
-    while clients['dealer'].get_hand_value() < 17:
-        time.sleep(1.5)
-        # os.system('cls' if os.name == 'nt' else 'clear')
-
-        clients['dealer'].draw(decklist.draw_card())
-        clients['dealer'].set_hand_value(clients['dealer'].count_hand())
-
-        # os.system('cls' if os.name == 'nt' else 'clear')
-        display_player_cards(clients['player'][1])
-        print()
-        display_player_cards(clients['dealer'])
-        print()
-        display_player_cards(clients['player'][0])
-
-
-def game_logic_split(clients, decklist, bet, loop_boolean):
-    dealer_17_logic(clients, decklist)
-    # os.system('cls' if os.name == 'nt' else 'clear')
-
-    # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
-    if clients['dealer'].get_hand_value() > 21:
-        outcome(clients, '\nDealer busts, you win!', 'won', bet)
-        loop_boolean = True
-
-    # Game logic, if you have a higher value than dealer at the end of all of this, you win!
-    if clients['player'][0].get_hand_value() > clients['dealer'].get_hand_value() and clients['player'][
-        0].get_hand_value() < 21:
-        outcome(clients, 'you win!', 'win', bet)
-        # f'\n{clients['player'][0].get_hand_value()} beats {clients['dealer'].get_hand_value()}, you win!', 'win', bet)
-
-    # Game logic, if you have the same values, you push or tie.
-    elif clients['player'][0].get_hand_value() == clients['dealer'].get_hand_value():
-        outcome(clients,
-                f'\n{clients['player'][0].get_hand_value()} ties {clients['dealer'].get_hand_value()}, you push!',
-                'pushed', 0)
-
-    # Game logic, if if dealer has more than you and is less than 21
-    if clients['player'][0].get_hand_value() < clients['dealer'].get_hand_value() and clients[
-        'dealer'].get_hand_value() < 21:
-        # Game logic, else you will therefore have nothing but less than them so you lose.
-        outcome(clients,
-                f'\n{clients['player'][0].get_hand_value()} loses to {clients['dealer'].get_hand_value()}, you lose!',
-                'lost', -bet)
-        loop_boolean = True
-    return loop_boolean
-
-
-def outcome(clients, print_prompt, win_lose, bet):
-    print()
-    display_player_cards(clients['player'][1])
-    display_player_cards(clients['dealer'])
-    display_player_cards(clients['player'][0])
-
-    dealer_value = clients['dealer'].get_hand_value()
-    p2_value = clients['player'][1].get_hand_value()
-    p1_value = clients['player'][0].get_hand_value()
-
-    print('\n', print_prompt)
-    clients['player'][0].set_player_wealth(clients['player'][0].get_player_wealth() + bet)
-
-    if p2_value > 21:
-        print("P2 busts, he lost!")
-    if p2_value < 21 and p1_value > dealer_value:
-        print("P2 beats Dealer")
-    if p2_value < 21 and p1_value < dealer_value:
-        print("P2 loses to Dealer")
-    if p2_value == dealer_value:
-        print("P2 pushes to Dealer")
-
-    print('\nYou', win_lose, str(bet), '! You now have $', clients['player'][0].get_player_wealth(), 'dollars!')
-    if clients['player'][0].get_player_wealth() <= 0 and len(clients['player'][0].get_items()) > 0:
-        print(f'You are out of money. You need to sell something in order to continue playing! \n ')
-        clients['player'][0].sell_item()
-        # item = input("Which item would you like to sell?")
-        # p1.print_item(item)
-
-
-# Function that allows the user to bet and returns that bet
-def user_bet(p1):
-    print("")
-    bets = int(input("How much would you like to bet: "))
-    while bets > p1.get_player_wealth():
-        print("You bet more money than you have. Please bet again!")
-        bets = int(input("\nHow much would you like to bet: "))
-    return bets
-
-
-# Choice function that asks for hit or stand and return the choice given by user.
-def choice():
-    user = input('\nHit or Stand | Type H or S: ')
-    boolean = True
-    while boolean:
-
-        # Try and catch in case the user does input something other than H or S.
-        try:
-            if user.upper() == 'H' or user.upper() == 'S':
-                boolean = False
-            else:
-                user = input('Not a valid input | Type H or S: ')
-        except:
+    for c in clients:
+        if c.name == 'DEALER':
             pass
+        elif c.value.get_flags()['natural_blackjack']: 
+        # win: natural blackjack, insta-win for player, winnings = 1.5 × bet
+            if clients.DEALER.value.get_flags()['natural_blackjack']:
+            # push: dealer ties player's natural blackjack
+                bet = c.value.get_player_bet()
+                wealth = c.value.get_player_wealth()
+                c.value.set_player_wealth(wealth + bet)
+                c.value.set_flag('push', True)
+                outcome_txt += c.name+" tied with dealer!\n"
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = int(bet*2.5)
+            c.value.set_player_wealth(wealth + winnings)
+            outcome_txt += c.name+" has natural blackjack! They won $"+str(winnings)+"\n"
+        elif clients.DEALER.value.get_flags()['bust']:
+        # win: dealer bust, everyone wins regardless of hand
+            if re.search("^PLAYER|^CPU", c.name): # RegEx for name search
+                # print("DEBUG@victory_resolution(): "+c.name+" check") #DEBUG
+                bet = c.value.get_player_bet()
+                wealth = c.value.get_player_wealth()
+                winnings = bet*2
+                c.value.set_player_wealth(wealth + winnings)
+                outcome_txt += "Dealer bust! "+c.name+" won $"+str(winnings)+"\n"
+        elif c.value.get_flags()["bust"]:
+        # lose: player bust, lose bet
+            outcome_txt += c.name+" busted and lost their bet of $"+str(c.value.get_player_bet())+"\n"
+        elif c.value.get_hand_value() == clients.DEALER.value.get_hand_value():
+        # tie: push, return bet to player
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            c.value.set_player_wealth(wealth + bet)
+            c.value.set_flag('push', True)
+            outcome_txt += c.name+" tied with dealer!\n"
+        elif c.value.get_flags()['blackjack']:
+        # win: regular blackjack, winnings = 1.5 × bet
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = int(bet*2.5)
+            c.value.set_player_wealth(wealth + winnings)
+            outcome_txt += c.name+" has blackjack! They won $"+str(winnings)+"\n"
+        elif c.value.get_hand_value() > clients.DEALER.value.get_hand_value():
+        # win: higher value than dealer
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = bet*2
+            c.value.set_player_wealth(int(wealth + winnings))
+            outcome_txt += c.name+" beat the dealer! They won $"+str(winnings)+"\n"
+        elif c.value.get_hand_value() < clients.DEALER.value.get_hand_value():
+        # lose: lower value than dealer
+            outcome_txt += c.name+" lost to the dealer!\n"
+        else:
+            print("AAAAAAAAHHHHHH!!! There was an error! This shouldn't happen!")
 
-    return user
+    return outcome_txt
+
+def cpu_resolve(clients, decklist):
+    # rules for CPU and Dealer drawing (CPU follow same rules as dealer)
+        # Dealer Hits: The dealer is required to draw if they have a hand of less than 17. 
+        # Dealer Stands: The dealer is required to stand with 17 and more in their hand. 
+    check_hands(clients)
+    for c in (clients):
+        if "PLAYER" not in c.name:
+            # print("DEBUG@cpu_resolve(): CPU play!",c.name)
+            if c.value.get_flags()['natural_blackjack']:
+                pass
+            else:
+                while c.value.get_hand_value() < 17:
+                    c.value.draw(decklist.draw_card())
+            c.value.set_flag('finished_turn', True)
+
+def hit_stand(c):
+    # gets user decision for hitting or standing
+    valid_choice = False
+    while not valid_choice:
+        try:
+            choice = str(input( (str(c.name)+" > Hit or stand? :") ))
+            if choice.lower() in ('h','hit'):
+                print(str(c.name) + " hits...")
+                choice = 'hit'
+                valid_choice = True
+            elif choice.lower() in ('s', 'stand'):
+                print(str(c.name) + " stands...")
+                choice = 'stand'
+                valid_choice = True
+            else:
+                print(Colors.red+"Please enter a valid input ('h','hit','s','stand')"+Colors.reset)
+        except KeyboardInterrupt:
+            print(Colors.red+"\nquitting..."+Colors.reset)
+            goodbye()
+            exit()
+        except BaseException as e:
+            # print(e) #DEBUG
+            print(Colors.red+"Ya broke it! Try again."+Colors.reset)
+
+    if choice == 'hit':
+        return "hit"
+    else:            
+        return "stand"
+
+def display_all_hands(clients, hide_hole=True):
+    time.sleep(0.5)
+    print()
+    print("┇"*50)
+    print()
+    for c in (clients):
+        if re.search("DEALER|PLAYER", c.name):
+            continue
+        # print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
+        print(c.value)
+        time.sleep(0.1)
+
+    
+    clients.DEALER.value.set_flag("hide_hole", hide_hole)
+    print(clients.DEALER.value)
+    time.sleep(0.1)
+    print(clients.PLAYER.value)
+
+
+def check_hands(clients):
+    # print("\t\tDEBUG@check_hands(): START CHECK")
+    for c in clients:
+        # print("\nDEBUG@check_hands(): client:"+c.name)
+        c = c.value
+
+        if c.get_flags()["bust"]:
+            # print("DEBUG@check_hands(): bust is true, skipping...")
+            continue
+
+        val = c.get_hand_value()
+
+        if val > 21:
+            c.set_flag("bust", True)
+        elif val == 21 and len(c.get_hand()) == 2: 
+            c.set_flag("natural_blackjack", True)
+        elif val == 21: 
+            c.set_flag("blackjack", True)
+
+def goodbye():
+
+    print("""
+  _   _                 _             
+ | | | |               | |            
+ | |_| |__   __ _ _ __ | | _____      
+ | __| '_ \\ / _` | '_ \\| |/ / __|     
+ | |_| | | | (_| | | | |   <\\__ \\     
+  \\__|_| |_|\\__,_|_| |_|_|\\_\\___/     
+  / _|                                
+ | |_ ___  _ __                       
+ |  _/ _ \\| '__|                      
+ | || (_) | |                         
+ |_| \\___/|_|         _             _ 
+       | |           (_)           | |
+  _ __ | | __ _ _   _ _ _ __   __ _| |
+ | '_ \\| |/ _` | | | | | '_ \\ / _` | |
+ | |_) | | (_| | |_| | | | | | (_| |_|
+ | .__/|_|\\__,_|\\__, |_|_| |_|\\__, (_)
+ | |             __/ |         __/ |  
+ |_|            |___/         |___/   
+ """)
 
 
 if __name__ == '__main__':
