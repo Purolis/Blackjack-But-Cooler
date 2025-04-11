@@ -13,11 +13,11 @@ Prerequisite: you must have python3 installed and callable from your terminal
 
 1. To play the game, first clone the repo `git clone https://github.com/Purolis/Blackjack-But-Cooler.git`
 2. Then open the directory of the cloned repo in the terminal of your choice.
-3. if you want to play the CLI version of the game:
-  3.1. navigate to `Code/CLI/` directory `cd Code/CLI/`
+3. if you want to play the CLI version of the game:<br>
+  3.1. navigate to `Code/CLI/` directory `cd Code/CLI/`<br>
   3.2. run `python3 main.py`
-4. if you want to run the GUI version of the game:
-  4.1. navigate to `Code/GUI/` directory `cd Code/GUI/`
+4. if you want to run the GUI version of the game:<br>
+  4.1. navigate to `Code/GUI/` directory `cd Code/GUI/`<br>
   4.2. run `python3 guiMain.py`
 
 Note: It will also run in PyCharm, but won't look as pretty in the CLI version.
