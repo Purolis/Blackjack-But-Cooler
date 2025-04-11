@@ -15,18 +15,12 @@ class Player(Dealer):
         self.set_items(items)
 
     # helpers
-
-    # def count_hand(self):
-    #     super().count_hand()
-
-
     def sell_item(self):
         """
         returns 0 for successful item sell; -1 for "unable to sell"
         """
         # check for empty inventory
-        if self.get_items() == {}:
-            print("You have no items to sell!")
+        if len(self.get_items()) <= 1:
             return -1 # error code, no items to sell, tell game to quit
         else:
             # display options to player
@@ -119,7 +113,7 @@ You sold your dog, I hope you're happy, malignant oaf."""+Colors.reset)
                 except (TypeError, ValueError):
                     print(Colors.red+"Please enter an integer dollar ammount."+Colors.reset)
                 except KeyboardInterrupt:
-                    print("\nquitting...")
+                    print(Colors.red+"\nquitting..."+Colors.reset)
                     exit()
                 except BaseException as e:
                     print(Colors.red+"Not sure what you did, but you broke it!"+Colors.reset)

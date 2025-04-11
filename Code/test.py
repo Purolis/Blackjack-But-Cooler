@@ -1,13 +1,15 @@
 # testing to make sure my changes work and don't cause a Chernobyl-esque disaster
 
 from Deck import Deck
-from Card import Card
 from Player import Player
 from Dealer import Dealer
+from Card import Card
+from Colors import Colors
 from enum import Enum
+import re
+import sys
 import os
 import time
-import sys
 
 # the tests listed highlight functionality in the changes I made
 
@@ -47,6 +49,7 @@ x) exit
 				running = False
 	exit()
 
+
 def flag_printing():
 	decklist = Deck([])
 	decklist.create_deck()
@@ -70,25 +73,53 @@ def flag_printing():
     # Create players and dealer and sets base wealth to 1000   
 	class Clients(Enum): 
 		PLAYER = Player([], 0, None, starting_balance, starting_items)
-		CPU1 = Dealer([], 0, "CPU1")
-		CPU2 = Dealer([], 0, "CPU2")
-		PSH = Dealer([], 0, "PSH") # this one is just for 'push' flag testing (set arbitrarily)
-		DEALER = Dealer([], 0, "DEALER")
+		NAT_BKJK = Player([], 0, "NAT_BKJK", starting_balance, {})
+		BLK_JK = Player([], 0, "BLK_JK", starting_balance, {})
+		OUT = Player([], 0, "OUT", 0, {})
+		BUST = Player([], 0, "BUST", starting_balance, {})
+		PSH = Player([], 0, "PSH", starting_balance, {}) # this one is just for 'push' flag testing (set arbitrarily)
+		DEALER1 = Dealer([], 0, "DEALER_hide")
+		DEALER2 = Dealer([], 0, "DEALER_show")
 
-	for c in (Clients):
-		c.value.draw(decklist.draw_card())
-		c.value.draw(decklist.draw_card())
-		c.value.draw(decklist.draw_card())
+	for i in range(3):
+		Clients.PLAYER.value.draw(decklist.draw_card())
+	Clients.NAT_BKJK.value.set_hand([
+		Card(11, 'Diamonds', 'Ace of Diamonds'), 
+		Card(10, 'Diamonds', 'Queen of Diamonds'), 
+		])
+	Clients.BLK_JK.value.set_hand([
+		Card(11, 'Diamonds', 'Ace of Diamonds'), 
+		Card(10, 'Diamonds', 'Queen of Diamonds'), 
+		Card(10, 'Hearts', 'King of Hearts'), 
+		])
+	Clients.BUST.value.set_hand([
+		Card(11, 'Diamonds', 'Ace of Diamonds'), 
+		Card(11, 'Hearts', 'Ace of Hearts'), 
+		Card(10, 'Diamonds', 'Queen of Diamonds'), 
+		Card(10, 'Diamonds', 'Jack of Diamonds'), 
+		])
+	Clients.PSH.value.set_hand([
+		Card(5, 'Diamonds', '5 of Diamonds'), 
+		Card(8, 'Diamonds', '8 of Diamonds'), 
+		])
+	Clients.DEALER1.value.set_hand([
+		Card(2, 'Diamonds', '2 of Diamonds'), 
+		Card(8, 'Diamonds', '8 of Diamonds'),  
+		])
+	Clients.DEALER2.value.set_hand([
+		Card(5, 'Diamonds', '5 of Diamonds'), 
+		Card(8, 'Diamonds', '8 of Diamonds'), 
+		])
 
 	check_hands(Clients)
-	Clients.PSH.value.set_flag("push", True)
+	Clients.OUT.value.set_flag('out_of_game', True)
 
-	for c in (Clients):
-		print("\t\t\tDEBUG@main(): flags")
-		print(c.name, str(c.value.get_flags()))
-		if c.name == "DEALER":
-			c.value.set_flag("hide_hole", True)
-		print(c.value)
+	display_all_hands(Clients)
+
+	Clients.DEALER1.value.set_flag('hide_hole', True)
+	Clients.DEALER2.value.set_flag('hide_hole', False)
+	print(Clients.DEALER1.value)
+	print(Clients.DEALER2.value)
 
 	
 def ace_reduction():
@@ -122,12 +153,10 @@ def ace_reduction():
 	print(user)
 	print(d1)
 
-
 def bet_test():
 	d1 = Dealer([],0,"DEALER")
 	user = Player([],0,None,200,{"foo":10}) 
 	user.bet()
-
 
 def toString_test():
 	#NOTE: this does not handle flags, so there are slight differences (no conditional text output)
@@ -160,7 +189,6 @@ def toString_test():
 	print(d2)
 	print(user)
 
-
 def item_test():
 	starting_items = {
 		"house": 170_000,
@@ -186,27 +214,37 @@ def item_test():
 			case _:
 				run = False
 
-
 def check_hands(clients):
-	# from main.py
-    # print("\t\tDEBUG@check_hands(): START CHECK")
+    print("\t\tDEBUG@check_hands(): START CHECK")
     for c in clients:
-        # print("\nDEBUG@check_hands(): client:"+c.name)
+        print("\nDEBUG@check_hands(): client:"+c.name)
         c = c.value
 
-        if c.get_flags()["bust"]:
-            # print("DEBUG@check_hands(): bust is true, skipping...")
+        if c.get_flags()["out_of_game"]:
+        	print("MEEP")
+        elif c.get_flags()["bust"]:
+            print("DEBUG@check_hands(): bust is true, skipping...")
+        else:
+	        val = c.get_hand_value()
+	        if val > 21:
+	            c.set_flag("bust", True)
+	        elif val == 21 and len(c.get_hand()) == 2: 
+	            c.set_flag("natural_blackjack", True)
+	        elif val == 21: 
+	            c.set_flag("blackjack", True)
+
+def display_all_hands(clients, hide_hole=True):
+    print()
+    time.sleep(0.5)
+    for c in (clients):
+        if re.search("DEALER|PLAYER", c.name):
             continue
+        # print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
+        print(c.value)
+        time.sleep(0.1)
 
-        val = c.get_hand_value()
-
-        if val > 21:
-            c.set_flag("bust", True)
-        elif val == 21 and len(c.get_hand()) == 2: 
-            c.set_flag("natural_blackjack", True)
-        elif val == 21: 
-            c.set_flag("blackjack", True)
-
+    print(clients.PLAYER.value)
+    time.sleep(0.1)
 
 if __name__ == '__main__':
 	# take in command-line arguments, launch as CLI or GUI

@@ -20,12 +20,14 @@ class Dealer:
             "push": False,
             "hide_hole": False,
             "finished_turn": False,
+            "out_of_game": False,
         })
 
     # Helpers
     def draw(self, card):
         if self.get_flags()["bust"]:
-            print("DEBUG@Dealer.py@draw(): client is busted, no drawing")
+            pass
+            # print("DEBUG@Dealer.py@draw(): client is busted, no drawing")
         else:
             self.__hand.append(card)
 
@@ -87,6 +89,7 @@ class Dealer:
         txt = ""
         flags = self.get_flags()
         color = None
+        hand = self.get_hand()
 
         # change text color to green if it is the active player, blue if not, and yellow if dealer
         if self.get_name() == None:
@@ -101,8 +104,6 @@ class Dealer:
 
         txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
 
-        hand = self.get_hand()
-
         flag_msg = "" # message to display conditionally
         if flags["bust"]:
             flag_msg += "├─ "+Colors.red+"BUSTED"+color+"\n"
@@ -112,13 +113,17 @@ class Dealer:
             flag_msg += "├─ "+Colors.yellow+"NATURAL BLACKJACK"+color+"\n"
         elif flags["push"]:
             flag_msg += "├─ "+Colors.yellow+"PUSH"+color+"\n"
-
+        elif flags['out_of_game']:
+            flag_msg += "├─ "+Colors.red+"QUIT-FROM-TABLE"+color+"\n"
+            txt += "╘═══════════════════════"+Colors.reset
+            return txt
+        
         if flags["hide_hole"]:
             # if dealer, hide all but one card (hide hole card(s))
             txt += "├ " + str(hand[0].get_card_name()) + "\n"
             txt += "├ [hidden] \n"
             txt += "┝┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅\n"
-            txt += "├─ Shown Hand Total: " + str(hand[0].get_value()) + "\n"
+            txt += "├─ Shown Card Total: " + str(hand[0].get_value()) + "\n"
             txt += "╘═══════════════════════"+Colors.reset
             return txt
         else:
@@ -128,5 +133,4 @@ class Dealer:
             txt += "├─ Hand Total: " + str(self.get_hand_value()) + "\n"
             txt += flag_msg
             txt += "╘═══════════════════════"+Colors.reset
-        
         return txt

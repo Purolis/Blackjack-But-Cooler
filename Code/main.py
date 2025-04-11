@@ -1,10 +1,3 @@
-# I decided to overhaul main.py
-# This runs, but isn't fully functional
-# I wasn't happy with our code whatsoever, so I've taken what I've learnt and coded until my brain melted and dribbled out my ears
-# I hope this makes sense and is expandable! I think this will be much easier to eventually give a GUI to.
-# I have been in the weeds here for a while, so it might be more confusing than I think it is
-#   - Nova
-
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
@@ -35,20 +28,19 @@ def main():
 ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 
 """)
 
-
 # --- INITIALIZATION ---
-    minimum_bet = 100
-    starting_balance = 100 # it is low like this to show functionality. Increase before releasing
+    minimum_bet = 1
+    starting_balance = 1000
     starting_items = {
-        # "house": 50_000,
-        # "firstborn": 30_000,
-        # "car": 25_000,
+        "house": 50_000,
+        "firstborn": 30_000,
+        "car": 25_000,
         "dog": 666,
-        # "watch": 500,
-        # "shoes": 90,
-        # "pants": 50,
-        # "shirt": 15,
-        "quit": "exit game"
+        "watch": 500,
+        "shoes": 90,
+        "pants": 50,
+        "shirt": 15,
+        "quit": "leave table and exit game"
     }
 
     # Create players and dealer and sets base wealth to 1000   
@@ -58,50 +50,23 @@ def main():
         CPU2 = Player([], 0, "CPU2", starting_balance, {})
         DEALER = Dealer([], 0, "DEALER")
 
-    game_loop(Clients, minimum_bet)
-    print("""
-  _   _                 _             
- | | | |               | |            
- | |_| |__   __ _ _ __ | | _____      
- | __| '_ \\ / _` | '_ \\| |/ / __|     
- | |_| | | | (_| | | | |   <\\__ \\     
-  \\__|_| |_|\\__,_|_| |_|_|\\_\\___/     
-  / _|                                
- | |_ ___  _ __                       
- |  _/ _ \\| '__|                      
- | || (_) | |                         
- |_| \\___/|_|         _             _ 
-       | |           (_)           | |
-  _ __ | | __ _ _   _ _ _ __   __ _| |
- | '_ \\| |/ _` | | | | | '_ \\ / _` | |
- | |_) | | (_| | |_| | | | | | (_| |_|
- | .__/|_|\\__,_|\\__, |_|_| |_|\\__, (_)
- | |             __/ |         __/ |  
- |_|            |___/         |___/   
- """)
+    game_loop(Clients, minimum_bet) # run until player exit or loss
+    goodbye()
     exit()
 
-
-
-
-
-######################## GAME LOGIC ########################
-
 def game_loop(clients, min_bet):
-    # misc variables
     running = True
-
     while running:
-        for c in clients:
-            c.value.reset_flags()
-
-        dealer_nat_black = False
-        nat_winners = []
-        did_bet = False
-
         print("\n\n-+-+- New round start! -+-+-\n\n")
 
+        # reset statuses
+        for c in clients:
+            c.value.reset_flags()
+            if c.name != 'DEALER':
+                c.value.set_player_bet(0)
+
         # user place bet (and sell if can't meet minimum [and lose if broke])
+        did_bet = False
         while not did_bet:
             bet_outcome = clients.PLAYER.value.bet(min_bet)
             if bet_outcome > 0:
@@ -112,27 +77,24 @@ def game_loop(clients, min_bet):
                 if sale_outcome == -1:
                     # no items to sell, game over
                     print("You don't have enough money to continue, and have no items to sell!")
+                    print("You Lost!")
                     print("Game Over!")
                     running = False
                     did_bet = True
                     return
                 elif sale_outcome == -2:
+                    # user chose to not sell; quit
+                    print("Game Over!")
                     running = False
                     did_bet = True
                     return
-
-
 
         # add CPU bets
         for c in clients:
             if 'cpu' in c.name.lower():
                 c.value.set_player_bet(min_bet)
                 c.value.set_player_wealth( c.value.get_player_wealth() - c.value.get_player_bet() )
-
-        # print("DEBUG@game_loop: player bet:",clients.PLAYER.value.get_player_bet()) #DEBUG
-        for c in clients:
-            if c.name.lower() not in ('dealer'):
-                print("DEBUG@game_loop: "+c.name+" bet:",c.value.get_player_bet()) #DEBUG
+                # print("DEBUG@game_loop: "+c.name+" bet:",c.value.get_player_bet()) #DEBUG
 
         # Creates a deck and shuffles the deck
         decklist = Deck([])
@@ -152,110 +114,129 @@ def game_loop(clients, min_bet):
         check_hands(clients)
         display_all_hands(clients)
 
-        # determine if end_round conditions are already met (turn-one blackjack)
+        # check for natural blackjack (first round win)
+        nat_bj_winners = []
         for c in (clients):
-            if c.value.get_flags()["natural_blackjack"]:
-                if c.name == "DEALER":
-                    print("DEBUG:: !!!DEALER!!!: NAT BLACKJACK")
-                    dealer_nat_black = True
-                else:
-                    print("DEBUG: "+str(c.name)+": NAT BLACKJACK")
-                    c.value.set_flag("natural_blackjack", True)
-                    nat_winners.append(c.name)
-
-        # if a player does have nat blackjack, check the dealer;   if both have nat black, player pushes
-        if nat_winners != [] and dealer_nat_black:
-            print("DEBUG: dealer+player natural_blackjack; push for player")
-            for name in nat_winners:
-                clients.name.set_flag("push", True)
-
-        # player wins with nat blackjack
-        # if len(nat_winners) == 1 and not dealer_nat_black:
-            # bet_resolution(clients)
-
-        # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
-        c_flag = clients.PLAYER.value.get_flags()
-        while not c_flag["bust"] and not c_flag["finished_turn"]:
-            c_decision = hit_stand(clients.PLAYER)
-            if c_decision == 'hit':
-                clients.PLAYER.value.draw(decklist.draw_card())
-                check_hands(clients)
-                print(clients.PLAYER.value)
+            if c.value.get_flags()['natural_blackjack']:
+                nat_bj_winners.append(c)
+        if len(nat_bj_winners) > 0:
+            if len(nat_bj_winners) == 1 and nat_bj_winners[0].name == "DEALER":
+                # handle edge case where dealer has natural blackjack by themself
+                pass
             else:
-                clients.PLAYER.value.set_flag('finished_turn', True)
-            # update flags for next iteration
-            check_hands(clients)
+                # natural blackjack ends round, dealer 
+                # cash out for winners, deal new hand
+                # print("DEBUG@game_loop: nat_bj_winners: "+str(nat_bj_winners)) #DEBUG
+                if clients.DEALER.value.get_flags()['natural_blackjack']:
+                    # if dealer also has nat bj, players push
+                    for c in nat_bj_winners:
+                        c.value.set_flag('push', True)
+                cpu_resolve(clients, decklist)
+                outcome_txt = victory_resolution(clients)
+                print()
+                print(outcome_txt)
+        else:
+            # no nat blackjacks to end game with: player continues to 'Hit, Stand, or Bust'
             c_flag = clients.PLAYER.value.get_flags()
+            while not c_flag["bust"] and not c_flag["finished_turn"]:
+                c_decision = hit_stand(clients.PLAYER)
+                if c_decision == 'hit':
+                    clients.PLAYER.value.draw(decklist.draw_card())
+                    check_hands(clients)
+                    print(clients.PLAYER.value)
+                else:
+                    clients.PLAYER.value.set_flag('finished_turn', True)
+                # update flags for next iteration
+                check_hands(clients)
+                c_flag = clients.PLAYER.value.get_flags()
 
-        # after player is done, let CPU and Dealer play
-        cpu_resolve(clients, decklist)
+            # after player is done, let CPU and Dealer play
+            cpu_resolve(clients, decklist)
 
-        # end-of-round display, dealer flips hole card
-        check_hands(clients)
-        display_all_hands(clients, hide_hole=False)
-        victory_check(clients)
+            # end-of-round display, dealer flips hole card
+            check_hands(clients)
+            outcome_txt = victory_resolution(clients)
+            display_all_hands(clients, hide_hole=False)
+            print()
+            print(outcome_txt)
 
-def victory_check(clients):
-    print("DEBUG@victory_check()") #DEBUG
-#Winning the Game
-    # Blackjack: 
-        # If your first two cards are an Ace and a 10-value card (10, Jack, Queen, King), 
-        # this is an automatic win (Blackjack) and pays out at a higher rate than a regular win (usually ×1.5).
-    # Higher Value than Dealer: 
-        # If your hand total is closer to 21 than the dealer’s hand total without going bust, you win. 
-        # Winnings are typically paid out at 1:1.
-    # Dealer Busts: 
-        # If the dealer’s hand total goes over 21 (busts), you win regardless of your hand value.
-    # Push: 
-        # If your hand total equals the dealer’s hand total, 
-        # it’s a tie (push) and your bet is returned without any winnings or losses.
-    # Lower Value than Dealer: 
-        # If the dealer’s hand total is closer to 21 than yours without busting, you lose your bet.
-
+def victory_resolution(clients):
+    # print("DEBUG@victory_resolution()") #DEBUG
     check_hands(clients)
     outcome_txt = ""
-    dealer_flags = clients.DEALER.value.get_flags()
 
-    if dealer_flags['bust']:
-        outcome_txt += "Dealer bust! Players reign supreme! (Everyone wins!)"
-        for c in clients:
-            if re.search("^player|^cpu", c.name.lower()): # RegEx for name search
-                # print("DEBUG@victory_check(): "+c.name+" check") #DEBUG
-                if not c.value.get_flags()['bust']:
-                    wealth = c.value.get_player_wealth()
-                    bet = c.value.get_player_bet()
-                    c.value.set_player_wealth(wealth + (bet*2))
-                    print(c.name+" gained $" + str(bet*2))
-    print(outcome_txt)
+    for c in clients:
+        if c.name == 'DEALER':
+            pass
+        elif c.value.get_flags()['natural_blackjack']: 
+        # win: natural blackjack, insta-win for player, winnings = 1.5 × bet
+            if clients.DEALER.value.get_flags()['natural_blackjack']:
+            # push: dealer ties player's natural blackjack
+                bet = c.value.get_player_bet()
+                wealth = c.value.get_player_wealth()
+                c.value.set_player_wealth(wealth + bet)
+                c.value.set_flag('push', True)
+                outcome_txt += c.name+" tied with dealer!\n"
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = int(bet*2.5)
+            c.value.set_player_wealth(wealth + winnings)
+            outcome_txt += c.name+" has natural blackjack! They won $"+str(winnings)+"\n"
+        elif clients.DEALER.value.get_flags()['bust']:
+        # win: dealer bust, everyone wins regardless of hand
+            if re.search("^PLAYER|^CPU", c.name): # RegEx for name search
+                # print("DEBUG@victory_resolution(): "+c.name+" check") #DEBUG
+                bet = c.value.get_player_bet()
+                wealth = c.value.get_player_wealth()
+                winnings = bet*2
+                c.value.set_player_wealth(wealth + winnings)
+                outcome_txt += "Dealer bust! "+c.name+" won $"+str(winnings)+"\n"
+        elif c.value.get_flags()["bust"]:
+        # lose: player bust, lose bet
+            outcome_txt += c.name+" busted and lost their bet of $"+str(c.value.get_player_bet())+"\n"
+        elif c.value.get_hand_value() == clients.DEALER.value.get_hand_value():
+        # tie: push, return bet to player
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            c.value.set_player_wealth(wealth + bet)
+            c.value.set_flag('push', True)
+            outcome_txt += c.name+" tied with dealer!\n"
+        elif c.value.get_flags()['blackjack']:
+        # win: regular blackjack, winnings = 1.5 × bet
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = int(bet*2.5)
+            c.value.set_player_wealth(wealth + winnings)
+            outcome_txt += c.name+" has blackjack! They won $"+str(winnings)+"\n"
+        elif c.value.get_hand_value() > clients.DEALER.value.get_hand_value():
+        # win: higher value than dealer
+            bet = c.value.get_player_bet()
+            wealth = c.value.get_player_wealth()
+            winnings = bet*2
+            c.value.set_player_wealth(int(wealth + winnings))
+            outcome_txt += c.name+" beat the dealer! They won $"+str(winnings)+"\n"
+        elif c.value.get_hand_value() < clients.DEALER.value.get_hand_value():
+        # lose: lower value than dealer
+            outcome_txt += c.name+" lost to the dealer!\n"
+        else:
+            print("AAAAAAAAHHHHHH!!! There was an error! This shouldn't happen!")
 
-
-    # Lose – the player’s bet is taken by the dealer.
-    # Win – the player wins as much as they bet. If you bet $10, you win $10 from the dealer (plus you keep your original bet, of course.)
-    # Blackjack (natural) – the player wins 1.5 times the bet. With a bet of $10, you keep your $10 and win a further $15 from the dealer.
-    # Push – the hand is a draw. The player keeps their bet, neither winning nor losing money.
-
-
-
+    return outcome_txt
 
 def cpu_resolve(clients, decklist):
-    # rules for CPU and Dealer drawing
+    # rules for CPU and Dealer drawing (CPU follow same rules as dealer)
         # Dealer Hits: The dealer is required to draw if they have a hand of less than 17. 
         # Dealer Stands: The dealer is required to stand with 17 and more in their hand. 
     check_hands(clients)
     for c in (clients):
-        if "player" not in c.name.lower():
-            print("DEBUG@cpu_resolve(): CPU play!",c.name)
-            while c.value.get_hand_value() < 17:
-                c.value.draw(decklist.draw_card())
+        if "PLAYER" not in c.name:
+            # print("DEBUG@cpu_resolve(): CPU play!",c.name)
+            if c.value.get_flags()['natural_blackjack']:
+                pass
+            else:
+                while c.value.get_hand_value() < 17:
+                    c.value.draw(decklist.draw_card())
             c.value.set_flag('finished_turn', True)
-
-
-
-def dealer_resolve(d):
-    pass
-
-
-
 
 def hit_stand(c):
     # gets user decision for hitting or standing
@@ -274,10 +255,11 @@ def hit_stand(c):
             else:
                 print(Colors.red+"Please enter a valid input ('h','hit','s','stand')"+Colors.reset)
         except KeyboardInterrupt:
-            print(Colors.red+"quitting..."+Colors.reset)
+            print(Colors.red+"\nquitting..."+Colors.reset)
+            goodbye()
             exit()
         except BaseException as e:
-            print(e) #DEBUG
+            # print(e) #DEBUG
             print(Colors.red+"Ya broke it! Try again."+Colors.reset)
 
     if choice == 'hit':
@@ -285,35 +267,24 @@ def hit_stand(c):
     else:            
         return "stand"
 
-
-
-    # user choice to hit or stand
-
-def bet_resolution(clients):
-    # method for resolving bets after a round has ended
-    # TODO
-    pass
-
-def end_round(clients, decklist):
-    # after all players have finished their turn, dealer follows drawing rules
-    # TODO
-    print("DEBUG@final_turn():") #DEBUG
-
-
-def check_for_win(clients):
-    for c in (clients):
-        if c.name == "DEALER" and c.value.get_flags()["bust"]:
-            print("*"*20,"DEALER BUST","*"*20)
-
 def display_all_hands(clients, hide_hole=True):
-    print()
     time.sleep(0.5)
+    print()
+    print("┇"*50)
+    print()
     for c in (clients):
-        if c.name == "DEALER":
-            c.value.set_flag("hide_hole", hide_hole)
-        print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
+        if re.search("DEALER|PLAYER", c.name):
+            continue
+        # print("DEBUG@display_all_hands(): "+c.name,str(c.value.get_flags())) #DEBUG
         print(c.value)
         time.sleep(0.1)
+
+    
+    clients.DEALER.value.set_flag("hide_hole", hide_hole)
+    print(clients.DEALER.value)
+    time.sleep(0.1)
+    print(clients.PLAYER.value)
+
 
 def check_hands(clients):
     # print("\t\tDEBUG@check_hands(): START CHECK")
@@ -334,85 +305,29 @@ def check_hands(clients):
         elif val == 21: 
             c.set_flag("blackjack", True)
 
+def goodbye():
 
-
-def test():
-# Creates a deck and shuffles the deck
-    decklist = Deck([])
-    decklist.create_deck()
-    decklist.shuffle_deck()
-    decklist.shuffle_deck()
-    decklist.shuffle_deck()
-
-    minimum_bet = 100
-    starting_balance = 100 # it is low like this to show functionality. Increase before releasing
-    starting_items = {
-        # "house": 50_000,
-        # "firstborn": 30_000,
-        # "car": 25_000,
-        "dog": 666,
-        # "watch": 500,
-        # "shoes": 90,
-        # "pants": 50,
-        # "shirt": 15,
-        "quit": "exit game"
-    }
-
-    # Create players and dealer and sets base wealth to 1000   
-    class Clients(Enum): # https://www.geeksforgeeks.org/enum-in-python/
-        PLAYER = Player([], 0, None, starting_balance, starting_items)
-        CPU1 = Player([], 0, "CPU1", starting_balance, {})
-        CPU2 = Player([], 0, "CPU2", starting_balance, {})
-        DEALER = Dealer([Card], 0, "DEALER")
-
-    Clients.DEALER.value.set_hand([
-        Card(10, 'Diamonds', 'Queen of Diamonds'), 
-        Card(10, 'Diamonds', 'King of Diamonds'), 
-        Card(10, 'Hearts', 'Queen of Hearts'),
-    ])
-
-    did_bet = False
-
-    print("\n\n-+-+- New round start! -+-+-\n\n")
-
-    # user place bet (and sell if can't meet minimum [and lose if broke])
-    while not did_bet:
-        bet_outcome = Clients.PLAYER.value.bet(100)
-        if bet_outcome > 0:
-            Clients.PLAYER.value.set_player_bet(bet_outcome)
-            did_bet = True
-        else:
-            sale_outcome = Clients.PLAYER.value.sell_item()
-            if sale_outcome == -1:
-                # no items to sell, game over
-                print("You don't have enough money to continue, and have no items to sell!")
-                print("Game Over!")
-                running = False
-                did_bet = True
-                return
-            elif sale_outcome == -2:
-                running = False
-                did_bet = True
-                return
-
-    # add CPU bets
-    for c in Clients:
-        if 'cpu' in c.name.lower():
-            c.value.set_player_bet(100)
-            c.value.set_player_wealth( c.value.get_player_wealth() - c.value.get_player_bet() )
-
-    check_hands(Clients)
-
-    cpu_resolve(Clients, decklist)
-
-    check_hands(Clients)
-
-    display_all_hands(Clients)
-    victory_check(Clients)
-    display_all_hands(Clients, hide_hole=False)
-
+    print("""
+  _   _                 _             
+ | | | |               | |            
+ | |_| |__   __ _ _ __ | | _____      
+ | __| '_ \\ / _` | '_ \\| |/ / __|     
+ | |_| | | | (_| | | | |   <\\__ \\     
+  \\__|_| |_|\\__,_|_| |_|_|\\_\\___/     
+  / _|                                
+ | |_ ___  _ __                       
+ |  _/ _ \\| '__|                      
+ | || (_) | |                         
+ |_| \\___/|_|         _             _ 
+       | |           (_)           | |
+  _ __ | | __ _ _   _ _ _ __   __ _| |
+ | '_ \\| |/ _` | | | | | '_ \\ / _` | |
+ | |_) | | (_| | |_| | | | | | (_| |_|
+ | .__/|_|\\__,_|\\__, |_|_| |_|\\__, (_)
+ | |             __/ |         __/ |  
+ |_|            |___/         |___/   
+ """)
 
 
 if __name__ == '__main__':
-    # main()
-    test()
+    main()
