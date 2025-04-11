@@ -31,18 +31,7 @@ COLORS = {
 dealer_h = SCR_HEIGHT*0.05
 player_h = SCR_HEIGHT*0.75
 
-
-def main():
-    home_screen()
-
-    # Creates a deck and shuffles the deck
-    decklist = Deck([])
-    decklist.create_deck()
-    decklist.shuffle_deck()
-
-    minimum_bet = 200
-
-    starting_items = {
+starting_items = {
         "house": 50_000,
         "firstborn": 30_000,
         "car": 25_000,
@@ -52,6 +41,14 @@ def main():
         "pants": 50,
         "shirt": 15,
     }
+
+minimum_bet = 200
+decklist = Deck([])
+
+
+def main():
+    home_screen()
+
     # Creates players and dealer and sets base wealth to 1000
     p1 = Player([], 0, None, 1000, starting_items)
     dealer = Dealer([], 0, "Dealer")
@@ -61,15 +58,37 @@ def main():
         "dealer": dealer,
     }
 
-    # Draws 2 cards for both the player and the dealer at the start
-    for x in range(2):
-        clients['player'].draw(decklist.draw_card())
-        clients['dealer'].draw(decklist.draw_card())
-
     # Initializes the actual game
     while True:
+
+        clients['player'].set_hand([])
+        clients['dealer'].set_hand([])
+
+        decklist.create_deck()
+        decklist.shuffle_deck()
+
+        for x in range(2):
+            clients['player'].draw(decklist.draw_card())
+            clients['dealer'].draw(decklist.draw_card())
+
         main_game_init(decklist, clients, minimum_bet)
-        time.sleep(2)
+
+        again = gui_input('WANT TO PLAY ANOTHER HAND? TYPE Y OR N: ')
+
+        while True:
+            if again.upper() == 'N':
+                clear_screen()
+                exit_thanks = create_text('THANK YOU FOR PLAYING!', COLORS['white'])
+                render_surface(exit_thanks, (SCR_WIDTH / 2 - exit_thanks.get_width() / 2, SCR_HEIGHT / 2 - exit_thanks.get_height() / 2))
+                update()
+                time.sleep(2)
+
+                pygame.quit()
+                sys.exit()
+            elif again.upper() == 'Y':
+                break
+            else:
+                again = gui_input('NOT A VALID INPUT, TYPE Y OR N: ')
 
 
 def home_screen():
@@ -105,15 +124,12 @@ def home_screen():
     img = pygame.image.load("assets/Flat-Playing-Cards-Set/Spades/A.png")
     img_w, img_h = img.get_size()
 
-    # game loop
     running = True
     while running:
         # stores the (x,y) coordinates of mouse position into the variable as a tuple
         mouse_pos = pygame.mouse.get_pos()
 
         # event handling
-        #   right now, the only "event" is closing the game.
-        #   TODO: *proper* event handling logic
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -198,7 +214,7 @@ def gui_input(input_prompt):
                 temp = create_text(choice, COLORS['white'])
 
                 prompt_w = SCR_WIDTH/2-(prompt.get_width()+temp.get_width())/2
-                temp_w = prompt_w+prompt.get_width()+10
+                temp_w = prompt_w+prompt.get_width()+15
                 height = SCR_HEIGHT/2-temp.get_height()/2
 
                 render_surface(temp, (temp_w, height))
@@ -255,23 +271,36 @@ def display_full_board(clients, dealer=True):
                     loop = False
 
 
+def enter_wait(x, y):
+
+    prompt = create_text('PRESS ENTER TO CONTINUE...', COLORS['white'])
+    render_surface(prompt, (x-prompt.get_width()/2, y))
+    update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == pygame.K_RETURN:
+                    return 0
+
+
 def main_game_init(decklist, clients, min_bet):
 
-    running = True
-    while running:
+    # first bet
+    bet_made = False
+    while not bet_made:
 
-        # first bet
-        bet_made = False
-        while not bet_made:
+        clear_screen()
+        money = create_text('YOU HAVE ' + str(clients['player'].get_player_wealth()) + ' DOLLARS!', COLORS['white'])
+        render_surface(money, (SCR_WIDTH / 2 - money.get_width() / 2, SCR_HEIGHT / 2 - money.get_height() / 2))
+        update()
+        time.sleep(2)
 
-            clear_screen()
-            money = create_text('YOU HAVE ' + str(clients['player'].get_player_wealth()) + ' DOLLARS!', COLORS['white'])
-            render_surface(money, (SCR_WIDTH / 2 - money.get_width() / 2, SCR_HEIGHT / 2 - money.get_height() / 2))
-            update()
-            time.sleep(2)
+        if clients['player'].get_player_wealth() >= min_bet:
 
-            # print("DEBUG:: betting1")
-            # bet = clients['player'].bet(min_bet)
             input = gui_input('HOW MUCH WOULD YOU LIKE TO BET: ')
 
             while True:
@@ -295,20 +324,8 @@ def main_game_init(decklist, clients, min_bet):
                 render_surface(temp, (SCR_WIDTH / 2 - temp.get_width() / 2, SCR_HEIGHT / 2 - temp.get_height() / 2))
                 update()
                 time.sleep(2)
-            elif bet == -1:
-                pass
-    #             print("DEBUG:: not enough money, sell")
-    #             # if a bet cannot be made, sell an item
-    #             did_sell = clients['player'].sell_item()
-    #             if did_sell == -1:
-    #                 print("DEBUG:: nothing to sell")
-    #                 # no items to sell, game over
-    #                 print("\n\n\tYou Lose!\n\tGame Over\n\tThank you for playing!\n")
-    #                 exit()
-    #             else:
-    #                 continue
             else:
-                # print("DEBUG:: locked in bet")
+
                 clear_screen()
                 bet_confirm = create_text(f'YOU BET {input} DOLLARS!', COLORS['white'])
                 render_surface(bet_confirm, (SCR_WIDTH/2-bet_confirm.get_width()/2, SCR_HEIGHT/2-bet_confirm.get_height()/2))
@@ -320,43 +337,55 @@ def main_game_init(decklist, clients, min_bet):
 
                 main_game_logic(clients, decklist, bet)
 
-                # new game init
-                clients['player'].set_hand([])
-                clients['dealer'].set_hand([])
+        else:
+            clear_screen()
+            no_money = create_text('YOU DON\'T HAVE ENOUGH MONEY, SELL SOME ITEMS', COLORS['white'])
+            render_surface(no_money, (SCR_WIDTH / 2 - no_money.get_width() / 2, SCR_HEIGHT / 2 - no_money.get_height() / 2))
+            update()
+            time.sleep(2)
 
-                # Recreate the deck
-                decklist.create_deck()
-                decklist.shuffle_deck()
+            selling = True
+            while selling:
+                # if a bet cannot be made, sell an item
+                did_sell = sell_item_gui(clients['player'])
+                if did_sell == -1:
+                    clear_screen()
+                    lose = create_text('GAME OVER!', COLORS['red'])
+                    render_surface(lose, (SCR_WIDTH / 2 - lose.get_width() / 2, SCR_HEIGHT / 2 - lose.get_height() / 2))
+                    update()
+                    time.sleep(2)
 
-                # Deals new hand
-                for x in range(2):
-                    clients['player'].draw(decklist.draw_card())
-                    clients['dealer'].draw(decklist.draw_card())
+                    clear_screen()
+                    lose = create_text('THANKS FOR PLAYING!', COLORS['white'])
+                    render_surface(lose, (SCR_WIDTH / 2 - lose.get_width() / 2, SCR_HEIGHT / 2 - lose.get_height() / 2))
+                    update()
+                    time.sleep(2)
 
-                good_hand = create_text('GOOD HAND!', COLORS['white'])
-                render_surface(good_hand, (0, 0))
-                again = gui_input('WANT TO PLAY ANOTHER HAND? TYPE Y OR N: ')
+                    pygame.quit()
+                    sys.exit()
 
-                while True:
-                    if again.upper() == 'N':
-                        clear_screen()
-                        exit_thanks = create_text('THANK YOU FOR PLAYING!', COLORS['white'])
-                        render_surface(exit_thanks, (SCR_WIDTH/2-exit_thanks.get_width()/2, SCR_HEIGHT/2-exit_thanks.get_height()/2))
-                        time.sleep(2)
-                        pygame.quit()
-                        sys.exit()
-                    elif again.upper() == 'Y':
-                        break
-                    else:
-                        again = gui_input('NOT A VALID INPUT, TYPE Y OR N: ')
+                if clients['player'].get_player_wealth() < min_bet:
+                    clear_screen()
+                    no_money = create_text('YOU STILL DON\'T HAVE ENOUGH MONEY, SELL MORE!!!!', COLORS['white'])
+                    render_surface(no_money, (SCR_WIDTH/2-no_money.get_width()/2, SCR_HEIGHT/2-no_money.get_height()/2))
+                    update()
+                    time.sleep(2)
+                else:
+                    clear_screen()
+                    gamble = create_text('YOU CAN FINALLY GAMBLE AGAIN! WHO NEEDS MONEY ANYWAY?', COLORS['white'])
+                    render_surface(gamble, (SCR_WIDTH/2-gamble.get_width()/2, SCR_HEIGHT/2-gamble.get_height()/2))
+                    update()
+                    time.sleep(2)
+
+                    bet_made = True
+                    selling = False
+    return 0
 
 
 def main_game_logic(clients, decklist, bet):
     loop_boolean = False
     # While choice is still going
     while not loop_boolean:
-        # os clears are just to make output look nice in command line,
-        # os.system('cls' if os.name == 'nt' else 'clear')
 
         # Count's the hand value
         clients['player'].set_hand_value(clients['player'].count_hand())
@@ -390,7 +419,9 @@ def main_game_logic(clients, decklist, bet):
 
                     # Game logic, if hand value is over 21 you lose automatically.
                     if clients['player'].get_hand_value() > 21:
-                        # os.system('cls' if os.name == 'nt' else 'clear')
+
+                        clear_screen()
+                        display_full_board(clients, False)
                         outcome(clients, 'YOU BUSTED, YOU LOSE!', 'LOST', -bet)
                         loop_boolean = True
                 else:
@@ -399,12 +430,18 @@ def main_game_logic(clients, decklist, bet):
                     loop_boolean = True
             else:
                 # Game logic, you had 21 at the start from the beginning if statement!
+                clear_screen()
+                display_full_board(clients, False)
                 outcome(clients, 'YOU HAVE BLACK JACK, YOU WIN!', 'WIN ', bet)
                 loop_boolean = True
         else:
             # Game logic, the dealer has black jack, you automatically lose no matter what.
+            clear_screen()
+            display_full_board(clients, False)
             outcome(clients, 'THE DEALER HAS BLACK JACK, YOU LOSE!', 'LOST', -bet)
             loop_boolean = True
+
+    return 0
 
 
 def dealer_17_logic(clients, decklist):
@@ -418,14 +455,14 @@ def dealer_17_logic(clients, decklist):
         clients['dealer'].draw(decklist.draw_card())
         clients['dealer'].set_hand_value(clients['dealer'].count_hand())
 
-        # os.system('cls' if os.name == 'nt' else 'clear')
         clear_screen()
         display_full_board(clients, False)
+
+    return 0
 
 
 def game_logic_split(clients, decklist, bet):
     dealer_17_logic(clients, decklist)
-    # os.system('cls' if os.name == 'nt' else 'clear')
 
     # Game logic, if dealer's hand is over 21 while they are hitting they lose automatically.
     if clients['dealer'].get_hand_value() > 21:
@@ -444,9 +481,118 @@ def game_logic_split(clients, decklist, bet):
         # Game logic, else you will therefore have nothing but less than them so you lose.
         outcome(clients, f'{clients['player'].get_hand_value()} LOSES TO {clients['dealer'].get_hand_value()}, YOU LOSE!', 'LOST', -bet)
 
+    return 0
+
+
+def sell_item_gui(client):
+    """
+    returns 0 for successful item sell; -1 for "unable to sell"
+    """
+    # check for empty inventory
+    if client.get_items() == {}:
+
+        clear_screen()
+        no_money = create_text('YOU HAVE NO ITEMS TO SELL!', COLORS['white'])
+        render_surface(no_money, (SCR_WIDTH/2-no_money.get_width()/2, SCR_HEIGHT/2-no_money.get_height()/2))
+        time.sleep(2)
+
+        return -1  # error code, no items to sell, tell game to quit
+
+    else:
+        # display options to player
+        clear_screen()
+        sell_opts = create_text('CHOOSE FROM BELOW WHICH ITEM TO SELL. TYPE THE FULL NAME OF THE ITEM', COLORS['white'])
+
+        alignment = sell_opts.get_height()
+
+        item_list = [sell_opts]
+        for i in client.get_items():
+
+            items = create_text(f'{str(i.title()).upper()}: {str(client.get_value(i))}', COLORS['white'])
+            item_list.append(items)
+            alignment += items.get_height()
+
+        choice = ''
+        input = True
+        while input:
+
+            prompt = create_text('CHOICE: ', COLORS['white'])
+            temp = create_text(choice, COLORS['white'])
+
+            prompt_w = SCR_WIDTH / 2 - (prompt.get_width() + temp.get_width()) / 2
+            temp_w = prompt_w + prompt.get_width() + 15
+            clear_screen()
+
+            keep_align = alignment/2
+            for item in item_list:
+                render_surface(item, (SCR_WIDTH/2-item.get_width()/2, SCR_HEIGHT/2-keep_align))
+                keep_align -= item.get_height()+15
+
+            render_surface(temp, (temp_w, SCR_HEIGHT/2-keep_align))
+            render_surface(prompt, (prompt_w, SCR_HEIGHT/2-keep_align))
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        choice = choice[:-1]
+                    elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.key == pygame.K_RETURN:
+
+                        # input validation for player selection
+                        valid_choice = choice
+                        valid = True
+
+                        for char in valid_choice:
+                            try:
+                                char = int(char)
+                                valid = False
+                                clear_screen()
+                                not_valid = create_text('THAT WAS NOT A VALID CHOICE!', COLORS['white'])
+                                render_surface(not_valid, (SCR_WIDTH/2-not_valid.get_width()/2, SCR_HEIGHT/2-not_valid.get_height()/2))
+                                update()
+                                time.sleep(2)
+                                break
+                            except:
+                                pass
+
+                        if valid_choice.lower() in starting_items and valid:
+                            input = False
+                        elif valid:
+                            clear_screen()
+                            not_valid = create_text('THAT WAS NOT A VALID CHOICE!', COLORS['white'])
+                            render_surface(not_valid, (SCR_WIDTH / 2 - not_valid.get_width() / 2, SCR_HEIGHT / 2 - not_valid.get_height() / 2))
+                            update()
+                            time.sleep(2)
+                    else:
+                        choice += event.unicode.upper()
+
+            update()
+
+        choice = choice.lower()
+
+        # update player wealth and items
+        new_items = client.get_items()
+        gained_wealth = new_items[choice]
+        client.set_player_wealth(client.get_player_wealth() + gained_wealth)
+
+        clear_screen()
+        new_money = create_text(f'GAINED WEALTH: {str(gained_wealth)}', COLORS['white'])
+        render_surface(new_money, (SCR_WIDTH/2-new_money.get_width()/2, SCR_HEIGHT/2-new_money.get_height()/2))
+
+        del (new_items[choice])
+        client.set_items(new_items)
+
+        new_wealth = create_text(f'NEW WEALTH TOTAL: {client.get_player_wealth()}', COLORS['white'])
+        render_surface(new_wealth, (SCR_WIDTH/2-new_wealth.get_width()/2, SCR_HEIGHT/2+new_wealth.get_height()+15))
+        update()
+        time.sleep(2)
+
+        return 0  # ran without issue
+
 
 def outcome(clients, print_prompt, win_lose, bet):
-    # display_full_board(clients, False)
 
     clear_screen()
     outcome_text = create_text(print_prompt.upper(), COLORS['white'])
@@ -462,21 +608,8 @@ def outcome(clients, print_prompt, win_lose, bet):
     update()
     time.sleep(2)
 
-    # if clients['player'].get_player_wealth() <= 0 and len(clients['player'].get_items()) > 0:
-    #
-    #     clear_screen()
-    #     no_money_prompt = create_text('YOU ARE OUT OF MONEY. YOU NEED TO SELL SOMETHING IN ORDER TO CONTINUE PLAYING!', COLORS['white'])
-    #     render_surface(no_money_prompt, (SCR_WIDTH/2-no_money_prompt.get_width()/2, SCR_HEIGHT/2-no_money_prompt.get_height()/2))
-    #     update()
-    #
-    #     clients['player'].sell_item()
-    #     # item = input("Which item would you like to sell?")
-    #     # p1.print_item(item)
+    return 0
 
 
 if __name__ == '__main__':
     main()
-
-# stop execution gracefully
-pygame.quit()
-sys.exit()
