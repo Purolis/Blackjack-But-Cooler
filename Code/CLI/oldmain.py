@@ -1,9 +1,11 @@
+# this file doesn't run, see main.py for functional code
+# keeping this for archival reasons
+
 from Deck import Deck
 from Player import Player
 from Dealer import Dealer
 import os
 import time
-
 
 def main():
     # Creates a deck and shuffles the deck
@@ -77,9 +79,6 @@ def main_game_init(decklist, clients, min_bet):
             for p in clients['player']:
                 p.set_hand([])
             clients['dealer'].set_hand([])
-            # p1.set_hand([])
-            # p2.set_hand([])
-            # dealer.set_hand([])
 
             # If the deck ever has no cards shuffle it
             if decklist.get_deck() == {}:
@@ -89,6 +88,10 @@ def main_game_init(decklist, clients, min_bet):
             print("Current Balance: $" + str(clients['player'][0].get_player_wealth()))
             print("\nDealing new hand....")
             time.sleep(1)
+
+            for player in clients['player']:
+                player.set_hand([])
+            clients['dealer'].set_hand([])
 
             for x in range(2):
                 for player in clients['player']:
@@ -104,20 +107,24 @@ def main_game_logic(clients, decklist, bet):
         # os.system('cls' if os.name == 'nt' else 'clear')
 
         # Count's the hand value
-        clients['player'][0].set_hand_value(clients['player'][0].count_hand())
-        clients['player'][1].set_hand_value(clients['player'][1].count_hand())
-        clients['dealer'].set_hand_value(clients['dealer'].count_hand())
+        user_val = clients['player'][1].get_hand_value()
+        p2_val = clients['player'][0].get_hand_value()
+        dealer_val = clients['dealer'].get_hand_value()
+
+        # clients['player'][0].set_hand_value(clients['player'][0].count_hand())
+        # clients['player'][1].set_hand_value(clients['player'][1].count_hand())
+        # clients['dealer'].set_hand_value(clients['dealer'].count_hand())
+            #DEBUG:: 🡹 above is not needed, I put set_hand_value() functionality into count_hand
 
         # If statements for game logic.
-        if clients['dealer'].get_hand_value() != 21:
-            while clients['player'][1].get_hand_value() < 17:
-                clients['player'][1].draw(decklist.draw_card())
-                clients['player'][1].set_hand_value(clients['player'][1].count_hand())
-            display_player_cards(clients['player'][1])
+        if dealer_val != 21:
+            while user_val < 17: #DEBUG this broke using: clients['player'][1].get_hand_value() : so now it uses an independent variable
+                clients['player'][1].draw(decklist.draw_card()) #DEBUG:: why draw another card???
+                clients['player'][1].count_hand() # DEBUG::deleted: set_hand_value(clients['player'][1].
+            display_player_cards(clients['player'][1]) #DEBUG why does this happen here?
 
             # If dealer doesn't have Blackjack, move forward and display the hands
-            if clients['player'][0].get_hand_value() != 21 or clients['player'][0].get_hand_value() == 21 and len(
-                    clients['player'][0].get_hand()) > 2:
+            if user_val != 21 or user_val == 21 and len(clients['player'][0].get_hand()) > 2:
                 print(clients['dealer'])
                 # print(f'[{dealer.get_hand()[0].get_name()}]', end=' ')
                 # print(f'[]\n')
@@ -159,11 +166,6 @@ def main_game_logic(clients, decklist, bet):
 # Function that neatly displays the cards in [example card] [example card]
 def display_player_cards(player):
     print(player)
-    # print(f'{player} Hand:')
-    # for card in hand:
-    #     print(f'[{card.get_name()}]', end=' ')
-    # print(f'[Value: {player_value}]')
-
 
 def dealer_17_logic(clients, decklist):
     # Game logic, if the dealer has less than 17, and you stand, they MUST hit until over 17.
@@ -172,7 +174,7 @@ def dealer_17_logic(clients, decklist):
         # os.system('cls' if os.name == 'nt' else 'clear')
 
         clients['dealer'].draw(decklist.draw_card())
-        clients['dealer'].set_hand_value(clients['dealer'].count_hand())
+        clients['dealer'].count_hand() # DEBUG::deleted: set_hand_value(clients['dealer'].
 
         # os.system('cls' if os.name == 'nt' else 'clear')
         display_player_cards(clients['player'][1])
@@ -192,24 +194,19 @@ def game_logic_split(clients, decklist, bet, loop_boolean):
         loop_boolean = True
 
     # Game logic, if you have a higher value than dealer at the end of all of this, you win!
-    if clients['player'][0].get_hand_value() > clients['dealer'].get_hand_value() and clients['player'][
-        0].get_hand_value() < 21:
+    if clients['player'][0].get_hand_value() > clients['dealer'].get_hand_value() and clients['player'][0].get_hand_value() < 21:
         outcome(clients, 'you win!', 'win', bet)
-        # f'\n{clients['player'][0].get_hand_value()} beats {clients['dealer'].get_hand_value()}, you win!', 'win', bet)
+                # f'\n{clients['player'][0].get_hand_value()} beats {clients['dealer'].get_hand_value()}, you win!', 'win', bet)
 
     # Game logic, if you have the same values, you push or tie.
     elif clients['player'][0].get_hand_value() == clients['dealer'].get_hand_value():
-        outcome(clients,
-                f'\n{clients['player'][0].get_hand_value()} ties {clients['dealer'].get_hand_value()}, you push!',
-                'pushed', 0)
+        outcome(clients, f'\n{clients['player'][0].get_hand_value()} ties {clients['dealer'].get_hand_value()}, you push!', 'pushed', 0)
 
     # Game logic, if if dealer has more than you and is less than 21
     if clients['player'][0].get_hand_value() < clients['dealer'].get_hand_value() and clients[
         'dealer'].get_hand_value() < 21:
         # Game logic, else you will therefore have nothing but less than them so you lose.
-        outcome(clients,
-                f'\n{clients['player'][0].get_hand_value()} loses to {clients['dealer'].get_hand_value()}, you lose!',
-                'lost', -bet)
+        outcome(clients, f'\n{clients['player'][0].get_hand_value()} loses to {clients['dealer'].get_hand_value()}, you lose!', 'lost', -bet)
         loop_boolean = True
     return loop_boolean
 
@@ -245,14 +242,14 @@ def outcome(clients, print_prompt, win_lose, bet):
 
 
 # Function that allows the user to bet and returns that bet
-def user_bet(p1):
-    print("")
-    bets = int(input("How much would you like to bet: "))
-    while bets > p1.get_player_wealth():
-        print("You bet more money than you have. Please bet again!")
-        bets = int(input("\nHow much would you like to bet: "))
-    return bets
-
+# def user_bet(p1):
+#     print("")
+#     bets = int(input("How much would you like to bet: "))
+#     while bets > p1.get_player_wealth():
+#         print("You bet more money than you have. Please bet again!")
+#         bets = int(input("\nHow much would you like to bet: "))
+#     return bets
+    # 🡹 depreciated 🡹
 
 # Choice function that asks for hit or stand and return the choice given by user.
 def choice():
