@@ -29,7 +29,7 @@ def main():
 """)
 
 # --- INITIALIZATION ---
-    minimum_bet = 1
+    minimum_bet = 100
     starting_balance = 1000
     starting_items = {
         "house": 50_000,
