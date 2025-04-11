@@ -23,6 +23,7 @@ Prerequisite: you must have python3 installed and callable from your terminal
 Note: It will also run in PyCharm, but won't look as pretty in the CLI version.
 
 ## Code
+> this information is outdated!
 ### GUI
 - [Button](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/Button.py)
 - [GUI](https://github.com/Purolis/Blackjack-But-Cooler/blob/main/Code/guiMain.py)
