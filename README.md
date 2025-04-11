@@ -9,11 +9,18 @@ Possible Ideas:
 - etc.... ( We don't know yet )
 
 ## Getting Started
-1. To get started, simply download the Code file [here](https://github.com/Purolis/Agile-Group-Project/tree/main/Code) and then go ahead and boot that up into the command prompt by simply cd C:\(directory). Go ahead and then just do driver.py (if in command line) or just run the driver.py file in PyCharm.
-2. For now, we just have Blackjack with somewhat of a built money system, but we'd like to expand on this and will make sure to create updates! It's that simple, just S for Stand, and H for hit.
-3. We have also implemented the basic Blackjack rules so your experience will be the same as the casinos!
+Prerequisite: you must have python3 installed and callable from your terminal
 
-Note: It will also work in PyCharm, but won't look as pretty.
+1. To play the game, first clone the repo `git clone https://github.com/Purolis/Blackjack-But-Cooler.git`
+2. Then open the directory of the cloned repo in the terminal of your choice.
+3. if you want to play the CLI version of the game:
+  3.1. navigate to `Code/CLI/` directory `cd Code/CLI/`
+  3.2. run `python3 main.py`
+4. if you want to run the GUI version of the game:
+  4.1. navigate to `Code/GUI/` directory `cd Code/GUI/`
+  4.2. run `python3 guiMain.py`
+
+Note: It will also run in PyCharm, but won't look as pretty in the CLI version.
 
 ## Code
 ### GUI
