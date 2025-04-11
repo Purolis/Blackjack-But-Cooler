@@ -7,3 +7,5 @@
 - The twist with this game is that everytime you lose a hand in the game you lose health until you run out causing you to lose.
 - The computer will also lose health whenever they lose a hand with the game ending when one of you loses all of their health.
 - That is the scope of the current project.
+- The user will be able to play with other computer players.
+- If we have time, the user will be able to play the game on a GUI.

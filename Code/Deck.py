@@ -25,9 +25,9 @@ class Deck:
         for suit in self.__card_suits:
             for card in self.__cards_list:
                 if card in self.__face_cards:
-                    self.__deck.append(Card(int(self.__face_cards[card]), suit, f'{card} of {suit}'))
+                    self.__deck.append(Card(int(self.__face_cards[card]), suit, f'{card} of {suit}', f'assets/Flat-Playing-Cards-Set/{suit}/{card[0]}.png'))
                 else:
-                    self.__deck.append(Card(int(card), suit, f'{card} of {suit}'))
+                    self.__deck.append(Card(int(card), suit, f'{card} of {suit}', f'assets/Flat-Playing-Cards-Set/{suit}/{card}.png'))
 
     # Helper that shuffles the deck
     def shuffle_deck(self):

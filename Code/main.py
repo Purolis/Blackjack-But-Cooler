@@ -53,7 +53,7 @@ def main():
     game_loop(Clients, minimum_bet) # run until player exit or loss
     goodbye()
     exit()
-
+    
 def game_loop(clients, min_bet):
     running = True
     while running:

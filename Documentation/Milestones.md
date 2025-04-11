@@ -57,7 +57,7 @@ Milestones
 
     -Create user stories
 
-04/04/2025 - 04/06/2025
+04/04/2025 - 04/08/2025
 
     -Implement more players 
 
@@ -68,3 +68,15 @@ Milestones
     -Refaactor new code
 
     -Collect all documentation for week two
+
+04/08/2025 - 04/11/25
+
+    - Clean up and refactor all code/add code to ensure game works properly.
+    
+    - Create a functioning GUI.
+    
+    - Ensure all documentation for the project is collected and neatly organized.
+    
+    - Update Blackjack UML.
+    
+    - Create more user stories and potentially other diagrams.
